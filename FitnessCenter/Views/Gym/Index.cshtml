@@ -1,0 +1,23 @@
+﻿@using FitnessCenter.Web.ViewModels.Gym
+@model IEnumerable<GymIndexViewModel> 
+
+<h2>Gyms</h2>
+
+<!-- Button to add a new cinema -->
+<a asp-action="Create" class="btn btn-success mb-4">Add New Gym</a>
+
+<div class="row">
+    @foreach (var gym in Model)
+    {
+        <div class="col-md-4">
+            <div class="card mb-4 shadow-sm">
+                <img src="~/images/gym-default.jpg" class="card-img-top" alt="Gym Image" style="height: 200px; object-fit: cover;">
+                <div class="card-body">
+                    <h5 class="card-title">@gym.Name</h5>
+                    <p class="card-text">@gym.Location</p>
+                    <a asp-action="Details" asp-route-id="@gym.Id" class="btn btn-primary">View Class Program</a>
+                </div>
+            </div>
+        </div>
+    }
+</div>

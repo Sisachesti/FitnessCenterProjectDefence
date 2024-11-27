@@ -1,0 +1,15 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net8.0</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\FitnessCenter.Common\FitnessCenter.Common.csproj" />
+    <ProjectReference Include="..\FitnessCenter.Data.Models\FitnessCenter.Data.Models.csproj" />
+    <ProjectReference Include="..\FitnessCenter.Services.Mapping\FitnessCenter.Services.Mapping.csproj" />
+  </ItemGroup>
+
+</Project>

@@ -1,0 +1,55 @@
+﻿﻿@using FitnessCenter.Services.Data.Interfaces
+@using FitnessCenter.Web.Infrastructure.Extensions
+@using FitnessCenter.Web.ViewModels.Class
+@using static FitnessCenter.Common.ErrorMessages.Plans
+
+@model IEnumerable<AllClassesIndexViewModel>
+@inject IManagerService managerService
+
+@if (TempData[nameof(AddToPlansNotSuccessfullMessage)] != null)
+{
+    <div class="alert alert-danger" role="alert">
+        @TempData[nameof(AddToPlansNotSuccessfullMessage)]
+    </div>
+}
+<h2>All Classes</h2>
+
+<table class="table table-striped">
+    <thead>
+        <tr>
+            <th>Title</th>
+            <th>Starting Date</th>
+            <th>Duration</th>
+            <th>Actions</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (AllClassesIndexViewModel classM in Model)
+        {
+            <tr>
+                <td>@classM.Title</td>
+                <td>@classM.StartingDate</td>
+                <td>@classM.Duration minutes</td>
+                <td>
+                    <a asp-action="Details" asp-route-id="@classM.Id" class="btn btn-info">Details</a>
+
+                    @if (User?.Identity?.IsAuthenticated ?? false)
+                    {
+                        <form asp-controller="Plan" asp-action="AddToPlans" method="post" class="d-inline">
+                            <input type="hidden" name="classId" value="@classM.Id" />
+                            <button type="submit" class="btn btn-warning">+Plans</button>
+                        </form>
+                    }
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>
+
+@if (User?.Identity?.IsAuthenticated ?? false)
+{
+    @if (await this.managerService.IsUserManagerAsync(this.User.GetUserId()))
+    {
+        <a asp-action="Create" class="btn btn-primary">Add New Class</a>
+    }
+}

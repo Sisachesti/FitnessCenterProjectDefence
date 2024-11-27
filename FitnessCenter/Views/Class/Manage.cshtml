@@ -1,0 +1,47 @@
+﻿﻿@using FitnessCenter.Services.Data.Interfaces
+@using FitnessCenter.Web.ViewModels.Class
+@model IEnumerable<AllClassesIndexViewModel>
+
+@{
+    ViewData["Title"] = "Manage Classes";
+}
+
+<h2 class="my-4 text-center">Manage Classes</h2>
+
+<div class="d-flex justify-content-end mb-4">
+    <a asp-action="Create" class="btn btn-success btn-lg">
+        <i class="bi bi-plus-circle"></i> Add New Class
+    </a>
+</div>
+
+<table class="table table-hover table-bordered">
+    <thead class="table-dark">
+        <tr>
+            <th scope="col">Title</th>
+            <th scope="col">Starting Date</th>
+            <th scope="col">Duration</th>
+            <th scope="col" class="text-center">Actions</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (AllClassesIndexViewModel classM in Model)
+        {
+            <tr>
+                <td>@classM.Title</td>
+                <td>@classM.StartingDate</td>
+                <td>@classM.Duration minutes</td>
+                <td class="text-center">
+                    <a asp-action="AddToProgram" asp-route-id="@classM.Id" class="btn btn-info btn-sm me-2">
+                        <i class="bi bi-calendar-plus"></i> Add to Program
+                    </a>
+                    <a asp-action="Edit" asp-route-id="@classM.Id" class="btn btn-primary btn-sm me-2">
+                        <i class="bi bi-pencil-square"></i> Edit
+                    </a>
+                    <a asp-action="Delete" asp-route-id="@classM.Id" class="btn btn-danger btn-sm">
+                        <i class="bi bi-trash"></i> Delete
+                    </a>
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>

@@ -1,0 +1,36 @@
+﻿﻿
+@model IEnumerable<FitnessCenter.Web.ViewModels.Plans.ApplicationUserPlansViewModel>
+
+@{
+    ViewData["Title"] = "Plans";
+}
+
+<h2>Your Watchlist</h2>
+
+<table class="table table-striped">
+    <thead>
+    <tr>
+        <th>Image</th>
+        <th>Title</th>
+        <th>Starting Date</th>
+    </tr>
+    </thead>
+    <tbody>
+    @foreach (var classM in Model)
+    {
+        <tr>
+            <td>
+                <img src="@classM.ImageUrl" alt="@classM.Title" width="100" />
+            </td>
+                <td>@classM.Title</td>
+                <td>@classM.StartingDate</td>
+            <td>
+                    <form asp-controller="Plan" asp-action="RemoveFromPlans" method="post" class="d-inline">
+                    <input type="hidden" name="classId" value="@classM.ClassId" />
+                    <button type="submit" class="btn btn-danger">Remove</button>
+                </form>
+            </td>
+        </tr>
+    }
+    </tbody>
+</table>
