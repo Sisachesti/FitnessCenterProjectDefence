@@ -64,19 +64,58 @@
             return true;
         }
 
-        public Task<bool> DeleteUserAsync(Guid userId)
+        public async Task<bool> DeleteUserAsync(Guid userId)
         {
-            throw new NotImplementedException();
+            ApplicationUser? user = await userManager
+                .FindByIdAsync(userId.ToString());
+
+            if (user == null)
+            {
+                return false;
+            }
+
+            IdentityResult? result = await this.userManager
+                .DeleteAsync(user);
+            if (!result.Succeeded)
+            {
+                return false;
+            }
+
+            return true;
         }
 
-        public Task<bool> RemoveUserRoleAsync(Guid userId, string roleName)
+        public async Task<bool> RemoveUserRoleAsync(Guid userId, string roleName)
         {
-            throw new NotImplementedException();
+            ApplicationUser? user = await userManager
+                .FindByIdAsync(userId.ToString());
+            bool roleExists = await this.roleManager.RoleExistsAsync(roleName);
+
+            if (user == null || !roleExists)
+            {
+                return false;
+            }
+
+            bool alreadyInRole = await this.userManager.IsInRoleAsync(user, roleName);
+            if (alreadyInRole)
+            {
+                IdentityResult? result = await this.userManager
+                    .RemoveFromRoleAsync(user, roleName);
+
+                if (!result.Succeeded)
+                {
+                    return false;
+                }
+            }
+
+            return true;
         }
 
-        public Task<bool> UserExistsByIdAsync(Guid userId)
+        public async Task<bool> UserExistsByIdAsync(Guid userId)
         {
-            throw new NotImplementedException();
+            ApplicationUser? user = await this.userManager
+                .FindByIdAsync(userId.ToString());
+
+            return user != null;
         }
     }
 }
