@@ -200,7 +200,7 @@
             if (!isDeleted)
             {
                 TempData["ErrorMessage"] =
-                    "Unexpected error occurred while trying to delete the cinema! Please contact system administrator!";
+                    "Unexpected error occurred while trying to delete the gym! Please contact system administrator!";
                 return this.RedirectToAction(nameof(Delete), new { id = gym.Id });
             }
 
