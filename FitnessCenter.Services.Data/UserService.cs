@@ -1,21 +1,70 @@
-﻿using FitnessCenter.Services.Data.Interfaces;
-using FitnessCenter.Web.ViewModels.Admin.UserManagement;
-
-namespace FitnessCenter.Services.Data
+﻿namespace FitnessCenter.Services.Data
 {
+    using FitnessCenter.Data.Models;
+    using FitnessCenter.Services.Data.Interfaces;
+    using FitnessCenter.Web.ViewModels.Admin.UserManagement;
+    using Microsoft.AspNetCore.Identity;
+    using Microsoft.EntityFrameworkCore;
     public class UserService : BaseService, IUserService
     {
-        public Task<bool> AssignUserToRoleAsync(Guid userId, string roleName)
+        private readonly UserManager<ApplicationUser> userManager;
+        private readonly RoleManager<IdentityRole<Guid>> roleManager;
+
+        public UserService(UserManager<ApplicationUser> userManager,
+            RoleManager<IdentityRole<Guid>> roleManager)
         {
-            throw new NotImplementedException();
+            this.userManager = userManager;
+            this.roleManager = roleManager;
+        }
+
+        public async Task<IEnumerable<AllUsersViewModel>> GetAllUsersAsync()
+        {
+            IEnumerable<ApplicationUser> allUsers = await this.userManager.Users
+                .ToArrayAsync();
+            ICollection<AllUsersViewModel> allUsersViewModel = new List<AllUsersViewModel>();
+
+            foreach (ApplicationUser user in allUsers)
+            {
+                IEnumerable<string> roles = await this.userManager.GetRolesAsync(user);
+
+                allUsersViewModel.Add(new AllUsersViewModel()
+                {
+                    Id = user.Id.ToString(),
+                    Email = user.Email,
+                    Roles = roles
+                });
+            }
+
+            return allUsersViewModel;
+        }
+
+        public async Task<bool> AssignUserToRoleAsync(Guid userId, string roleName)
+        {
+            ApplicationUser? user = await userManager
+                .FindByIdAsync(userId.ToString());
+            bool roleExists = await this.roleManager.RoleExistsAsync(roleName);
+
+            if (user == null || !roleExists)
+            {
+                return false;
+            }
+
+            bool alreadyInRole = await this.userManager.IsInRoleAsync(user, roleName);
+            if (!alreadyInRole)
+            {
+                IdentityResult? result = await this.userManager
+                    .AddToRoleAsync(user, roleName);
+
+                if (!result.Succeeded)
+                {
+                    return false;
+                }
+            }
+
+            return true;
         }
 
         public Task<bool> DeleteUserAsync(Guid userId)
-        {
-            throw new NotImplementedException();
-        }
-
-        public Task<IEnumerable<AllUsersViewModel>> GetAllUsersAsync()
         {
             throw new NotImplementedException();
         }
