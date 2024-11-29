@@ -1,5 +1,6 @@
 ﻿﻿@using FitnessCenter.Services.Data.Interfaces
 @using FitnessCenter.Web.ViewModels.Class
+@using static FitnessCenter.Common.EntityValidationConstants.Class
 @model IEnumerable<AllClassesIndexViewModel>
 
 @{
@@ -34,7 +35,7 @@
                     <a asp-action="AddToProgram" asp-route-id="@classM.Id" class="btn btn-info btn-sm me-2">
                         <i class="bi bi-calendar-plus"></i> Add to Program
                     </a>
-                    <a asp-action="Edit" asp-route-id="@classM.Id" class="btn btn-primary btn-sm me-2">
+                    <a asp-action="Edit" asp-route-id="@classM.Id" class="btn btn-warning btn-sm me-2">
                         <i class="bi bi-pencil-square"></i> Edit
                     </a>
                     <a asp-action="Delete" asp-route-id="@classM.Id" class="btn btn-danger btn-sm">

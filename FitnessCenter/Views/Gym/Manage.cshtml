@@ -18,19 +18,19 @@
         </tr>
     </thead>
     <tbody>
-        @foreach (var classM in Model)
+        @foreach (var gym in Model)
         {
-            <tr>
-                <td>@classM.Name</td>
-                <td>@classM.Location</td>
+                <tr>
+                <td>@gym.Name</td>
+                <td>@gym.Location</td>
                 <td class="text-center">
-                    <a asp-action="Details" asp-route-id="@classM.Id" class="btn btn-primary btn-sm me-2">
+                    <a asp-controller="Gym" asp-action="Details" asp-route-id="@gym.Id" class="btn btn-primary btn-sm me-2">
                         <i class="bi bi-pencil-square"></i> View Program
                     </a>
-                    <a asp-action="Edit" asp-route-id="@classM.Id" class="btn btn-warning btn-sm me-2">
+                    <a asp-controller="Gym" asp-action="Edit" asp-route-id="@gym.Id" class="btn btn-warning btn-sm me-2">
                         <i class="bi bi-pencil-square"></i> Edit
                     </a>
-                    <a asp-action="Delete" asp-route-id="@classM.Id" class="btn btn-danger btn-sm">
+                    <a asp-controller="Gym" asp-action="Delete" asp-route-id="@gym.Id" class="btn btn-danger btn-sm">
                         <i class="bi bi-trash"></i> Delete
                     </a>
                 </td>

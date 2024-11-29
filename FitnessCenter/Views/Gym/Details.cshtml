@@ -37,13 +37,13 @@
                             @if (await this.managerService.IsUserManagerAsync(this.User.GetUserId()))
                             {
                                 <button type="button" class="btn btn-primary btn-sm" onclick="openManageSubscribtionsModal('@Model.Id')">
-                                    <i class="bi bi-ticket-perforated"></i> Manage Tickets
+                                    <i class="bi bi-subscribtion-perforated"></i> Manage Subscribtions
                                 </button>
                             }
                             else
                             {
                                 <button type="button" class="btn btn-success btn-sm" onclick="buySubscribtionsModal('@Model.Id', '@classM.Id')">
-                                    <i class="bi bi-ticket-perforated"></i> Buy Tickets
+                                    <i class="bi bi-subscribtion-perforated"></i> Buy Subscribtions
                                 </button>
                             }
                         </div>
@@ -73,4 +73,4 @@
     }
 </div>
 
-<script src="~/js/manageTickets.js"></script>
+<script src="~/js/manageSubscribtions.js"></script>
