@@ -100,6 +100,7 @@ namespace FitnessCenter.Services.Data
         {
             Gym? gymToDelete = await this.gymRepository
                 .FirstOrDefaultAsync(c => c.Id.ToString().ToLower() == id.ToString().ToLower());
+
             if (gymRepository == null)
             {
                 return false;

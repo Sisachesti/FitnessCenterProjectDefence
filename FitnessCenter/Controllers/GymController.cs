@@ -197,6 +197,7 @@
 
             bool isDeleted = await this.gymService
                 .SoftDeleteGymAsync(gymGuid);
+
             if (!isDeleted)
             {
                 TempData["ErrorMessage"] =

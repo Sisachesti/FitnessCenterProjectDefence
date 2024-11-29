@@ -212,10 +212,10 @@
                 return this.RedirectToAction(nameof(Index));
             }
 
-            IEnumerable<AllClassesIndexViewModel> movies =
+            IEnumerable<AllClassesIndexViewModel> classes =
                 await this.classService.GetAllClassesAsync();
 
-            return this.View(movies);
+            return this.View(classes);
         }
     }
 }

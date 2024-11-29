@@ -173,8 +173,10 @@ namespace FitnessCenter.Services.Data
             // TODO: Check soft delete
             EditClassFormModel? editClassFormModel = await this.classRepository
                 .GetAllAttached()
+                .Where(c => c.IsDeleted == false)
                 .To<EditClassFormModel>()
-                .FirstOrDefaultAsync(m => m.Id.ToLower() == id.ToString().ToLower());
+                .FirstOrDefaultAsync(c => c.Id.ToLower() == id.ToString().ToLower());
+
             if (editClassFormModel != null &&
                 editClassFormModel.ImageUrl.Equals(NoImageUrl))
             {

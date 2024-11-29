@@ -14,6 +14,8 @@
 
         public string? ImageUrl { get; set; }
 
+        public bool IsDeleted { get; set; }
+
         public virtual ICollection<GymClass> ClassGyms { get; set; }
             = new HashSet<GymClass>();
 
