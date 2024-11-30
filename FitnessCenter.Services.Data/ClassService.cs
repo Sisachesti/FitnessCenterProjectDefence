@@ -110,10 +110,11 @@ namespace FitnessCenter.Services.Data
             return viewModel;
         }
 
-        public async Task<bool> AddClassToGymsAsync(Guid movieId, AddClassToGymInputModel model)
+        public async Task<bool> AddClassToGymsAsync(Guid classId, AddClassToGymInputModel model)
         {
             Class? classM = await this.classRepository
-                .GetByIdAsync(movieId);
+                .GetByIdAsync(classId);
+
             if (classM == null)
             {
                 return false;
@@ -123,6 +124,7 @@ namespace FitnessCenter.Services.Data
             foreach (GymCheckBoxItemInputModel gymInputModel in model.Gyms)
             {
                 Guid gymGuid = Guid.Empty;
+
                 bool isGymGuidValid = this.IsGuidValid(gymInputModel.Id, ref gymGuid);
                 if (!isGymGuidValid)
                 {
@@ -131,14 +133,16 @@ namespace FitnessCenter.Services.Data
 
                 Gym? gym = await this.gymRepository
                     .GetByIdAsync(gymGuid);
+
                 if (gym == null || gym.IsDeleted)
                 {
                     return false;
                 }
 
                 GymClass? gymClass = await this.gymClassRepository
-                    .FirstOrDefaultAsync(cm => cm.ClassId == movieId &&
+                    .FirstOrDefaultAsync(cm => cm.ClassId == classId &&
                                                      cm.GymId == gymGuid);
+
                 if (gymInputModel.IsSelected)
                 {
                     if (gymClass == null)

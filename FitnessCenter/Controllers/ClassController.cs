@@ -109,6 +109,7 @@
 
             AddClassToGymInputModel? viewModel = await this.classService
                 .GetAddClassToGymInputModelByIdAsync(classGuid);
+
             if (viewModel == null)
             {
                 return this.RedirectToAction(nameof(Index));
@@ -141,6 +142,7 @@
 
             bool result = await this.classService
                 .AddClassToGymsAsync(classGuid, model);
+
             if (result == false)
             {
                 return this.RedirectToAction(nameof(Index));

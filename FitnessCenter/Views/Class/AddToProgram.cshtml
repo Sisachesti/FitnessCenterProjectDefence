@@ -37,9 +37,9 @@
 
 @if (await this.managerService.IsUserManagerAsync(this.User.GetUserId()))
 {
-    <a asp-action="Manage" class="btn btn-secondary mt-3">Back to Movies</a>
+    <a asp-action="Manage" class="btn btn-secondary mt-3">Back to Classes</a>
 }
 else
 {
-    <a asp-action="Index" class="btn btn-secondary mt-3">Back to Movies</a>
+    <a asp-action="Index" class="btn btn-secondary mt-3">Back to Classes</a>
 }

@@ -22,13 +22,13 @@ namespace FitnessCenter.Data.Configuration
             builder
                 .HasOne(cm => cm.Class)
                 .WithMany(m => m.ClassGyms)
-                .HasForeignKey(cm => cm.GymId)
+                .HasForeignKey(cm => cm.ClassId)
                 .OnDelete(DeleteBehavior.Restrict);
 
             builder
                 .HasOne(cm => cm.Gym)
                 .WithMany(c => c.GymClasses)
-                .HasForeignKey(cm => cm.ClassId)
+                .HasForeignKey(cm => cm.GymId)
                 .OnDelete(DeleteBehavior.Restrict);
         }
     }
