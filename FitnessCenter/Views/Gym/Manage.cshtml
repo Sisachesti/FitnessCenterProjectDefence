@@ -20,6 +20,8 @@
     <tbody>
         @foreach (var gym in Model)
         {
+            if (gym.IsDeleted == false)
+            {
                 <tr>
                 <td>@gym.Name</td>
                 <td>@gym.Location</td>
@@ -34,7 +36,8 @@
                         <i class="bi bi-trash"></i> Delete
                     </a>
                 </td>
-            </tr>
+                </tr>
+            }
         }
     </tbody>
 </table>

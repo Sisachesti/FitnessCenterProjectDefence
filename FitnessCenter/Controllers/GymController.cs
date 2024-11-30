@@ -171,6 +171,7 @@
 
             DeleteGymViewModel? gymToDeleteViewModel =
                 await this.gymService.GetGymForDeleteByIdAsync(gymGuid);
+
             if (gymToDeleteViewModel == null)
             {
                 return this.RedirectToAction(nameof(Manage));
