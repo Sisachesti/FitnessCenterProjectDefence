@@ -203,6 +203,7 @@ namespace FitnessCenter.Services.Data
 
             bool isStartingDateValid = DateTime.TryParseExact(formModel.StartingDate, StartingDateFormat,
                 CultureInfo.InvariantCulture, DateTimeStyles.None, out DateTime startingDate);
+
             if (!isStartingDateValid)
             {
                 return false;

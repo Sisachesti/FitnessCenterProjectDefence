@@ -12,6 +12,7 @@ namespace FitnessCenter.Web.ViewModels.Class
     using static Common.EntityValidationMessages.Class;
     using Data.Models;
     using FitnessCenter.Services.Mapping;
+    using System.Globalization;
 
     public class EditClassFormModel : IMapFrom<Class>, IMapTo<Class>, IHaveCustomMappings
     {
@@ -41,7 +42,7 @@ namespace FitnessCenter.Web.ViewModels.Class
         {
             configuration.CreateMap<Class, EditClassFormModel>()
                 .ForMember(d => d.StartingDate,
-                    opt => opt.MapFrom(s => s.StartingDate.ToString(StartingDateFormat)));
+                    opt => opt.MapFrom(s => s.StartingDate.ToString(StartingDateFormat, CultureInfo.InvariantCulture)));
 
             configuration.CreateMap<EditClassFormModel, Class>()
                 .ForMember(d => d.Id, opt => opt.Ignore())

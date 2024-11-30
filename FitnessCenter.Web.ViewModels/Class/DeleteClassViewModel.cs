@@ -4,6 +4,7 @@ namespace FitnessCenter.Web.ViewModels.Class
 {
     using AutoMapper;
     using Data.Models;
+    using System.Globalization;
     using static Common.EntityValidationConstants.Class;
 
     public class DeleteClassViewModel : IMapFrom<Class>, IHaveCustomMappings
@@ -26,7 +27,7 @@ namespace FitnessCenter.Web.ViewModels.Class
         {
             configuration.CreateMap<Class, EditClassFormModel>()
                 .ForMember(d => d.StartingDate,
-                    opt => opt.MapFrom(s => s.StartingDate.ToString(StartingDateFormat)));
+                    opt => opt.MapFrom(s => s.StartingDate.ToString(StartingDateFormat, CultureInfo.InvariantCulture)));
         }
     }
 }

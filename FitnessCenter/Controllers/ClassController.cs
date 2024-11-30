@@ -199,7 +199,7 @@
 
             if (!isUpdated)
             {
-                ModelState.AddModelError(string.Empty, "Unexpected error occurred while updating the gym! Please contact administrator");
+                ModelState.AddModelError(string.Empty, "Unexpected error occurred while updating the class! Please contact administrator");
                 return this.View(formModel);
             }
 

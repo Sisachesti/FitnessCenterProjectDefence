@@ -5,7 +5,9 @@
 
 @inject IManagerService managerService
 
-<h2>Edit Movie</h2>
+<h2>Edit Class</h2>
+
+@Html.ValidationSummary(true, "", new { @class = "text-danger" })
 
 <form asp-action="Edit" method="post">
     @Html.AntiForgeryToken()

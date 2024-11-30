@@ -2,8 +2,10 @@
 @using FitnessCenter.Web.Infrastructure.Extensions
 @using FitnessCenter.Web.ViewModels.Class
 @using static FitnessCenter.Common.ErrorMessages.Plans
+@using static FitnessCenter.Common.EntityValidationConstants.Class
 
 @model IEnumerable<AllClassesIndexViewModel>
+
 @inject IManagerService managerService
 
 @if (TempData[nameof(AddToPlansNotSuccessfullMessage)] != null)
@@ -13,7 +15,12 @@
     </div>
 }
 
-<h2>All Classes</h2>
+<h2>Classes</h2>
+
+@if (await this.managerService.IsUserManagerAsync(this.User.GetUserId()))
+{
+    <a asp-action="Create" class="btn btn-success mb-4">Add New Class</a>
+}
 
 <table class="table table-striped">
     <thead>

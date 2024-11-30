@@ -5,6 +5,7 @@ namespace FitnessCenter.Web.ViewModels.Class
     using static Common.EntityValidationConstants.Class;
     using Data.Models;
     using FitnessCenter.Services.Mapping;
+    using System.Globalization;
 
     public class AllClassesIndexViewModel : IMapFrom<Class>, IHaveCustomMappings
     {
@@ -22,7 +23,7 @@ namespace FitnessCenter.Web.ViewModels.Class
         {
             configuration.CreateMap<Class, AllClassesIndexViewModel>()
                 .ForMember(d => d.StartingDate,
-                    x => x.MapFrom(s => s.StartingDate.ToString(StartingDateFormat)));
+                    x => x.MapFrom(s => s.StartingDate.ToString(StartingDateFormat, CultureInfo.InvariantCulture)));
         }
     }
 }

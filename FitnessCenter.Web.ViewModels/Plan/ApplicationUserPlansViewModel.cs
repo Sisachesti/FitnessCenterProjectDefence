@@ -4,6 +4,7 @@ namespace FitnessCenter.Web.ViewModels.Plans
 {
     using Data.Models;
     using FitnessCenter.Services.Mapping;
+    using System.Globalization;
     using static Common.EntityValidationConstants.Class;
     public class ApplicationUserPlansViewModel : IHaveCustomMappings
     {
@@ -21,7 +22,7 @@ namespace FitnessCenter.Web.ViewModels.Plans
                 .CreateMap<ApplicationUserClass, ApplicationUserPlansViewModel>()
                 .ForMember(d => d.ClassId, x => x.MapFrom(s => s.ClassId.ToString()))
                 .ForMember(d => d.Title, x => x.MapFrom(s => s.Class.Title))
-                .ForMember(d => d.StartingDate, x => x.MapFrom(s => s.Class.StartingDate.ToString(StartingDateFormat)))
+                .ForMember(d => d.StartingDate, x => x.MapFrom(s => s.Class.StartingDate.ToString(StartingDateFormat, CultureInfo.InvariantCulture)))
                 .ForMember(d => d.ImageUrl, x => x.MapFrom(s => s.Class.ImageUrl));
         }
     }
