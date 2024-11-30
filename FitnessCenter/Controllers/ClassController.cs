@@ -194,6 +194,7 @@
 
             bool isUpdated = await this.classService
                 .EditClassAsync(formModel);
+
             if (!isUpdated)
             {
                 ModelState.AddModelError(string.Empty, "Unexpected error occurred while updating the gym! Please contact administrator");

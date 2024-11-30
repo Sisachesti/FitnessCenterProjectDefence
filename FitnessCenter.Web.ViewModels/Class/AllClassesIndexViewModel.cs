@@ -16,6 +16,8 @@ namespace FitnessCenter.Web.ViewModels.Class
 
         public string Duration { get; set; } = null!;
 
+        public bool IsDeleted { get; set; }
+
         public void CreateMappings(IProfileExpression configuration)
         {
             configuration.CreateMap<Class, AllClassesIndexViewModel>()

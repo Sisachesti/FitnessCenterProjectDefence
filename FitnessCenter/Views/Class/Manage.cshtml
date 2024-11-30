@@ -27,7 +27,9 @@
     <tbody>
         @foreach (AllClassesIndexViewModel classM in Model)
         {
-            <tr>
+            if (classM.IsDeleted == false)
+            {
+                <tr>
                 <td>@classM.Title</td>
                 <td>@classM.StartingDate</td>
                 <td>@classM.Duration minutes</td>
@@ -43,6 +45,8 @@
                     </a>
                 </td>
             </tr>
+            }
+            
         }
     </tbody>
 </table>

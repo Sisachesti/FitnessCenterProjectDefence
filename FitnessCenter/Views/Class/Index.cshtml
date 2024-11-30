@@ -12,6 +12,7 @@
         @TempData[nameof(AddToPlansNotSuccessfullMessage)]
     </div>
 }
+
 <h2>All Classes</h2>
 
 <table class="table table-striped">
@@ -26,7 +27,9 @@
     <tbody>
         @foreach (AllClassesIndexViewModel classM in Model)
         {
-            <tr>
+            if (classM.IsDeleted == false)
+            {
+                <tr>
                 <td>@classM.Title</td>
                 <td>@classM.StartingDate</td>
                 <td>@classM.Duration minutes</td>
@@ -42,6 +45,8 @@
                     }
                 </td>
             </tr>
+            }
+            
         }
     </tbody>
 </table>
