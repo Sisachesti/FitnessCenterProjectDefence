@@ -1,4 +1,5 @@
 ﻿using FitnessCenter.Web.ViewModels.Class;
+using FitnessCenter.Web.ViewModels.Gym;
 using FitnessCenter.Web.ViewModels.GymClass;
 
 namespace FitnessCenter.Services.Data.Interfaces
@@ -20,5 +21,9 @@ namespace FitnessCenter.Services.Data.Interfaces
         Task<bool> EditClassAsync(EditClassFormModel formModel);
 
         Task<AvailableSubscribtionsViewModel?> GetAvailableSubscribtionsByIdAsync(Guid cinemaId, Guid movieId);
+
+        Task<DeleteClassViewModel?> GetClassForDeleteByIdAsync(Guid id);
+
+        Task<bool> SoftDeleteClassAsync(Guid id);
     }
 }

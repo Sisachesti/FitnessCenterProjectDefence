@@ -235,5 +235,30 @@ namespace FitnessCenter.Services.Data
 
             return availableSubscribtionsViewModel;
         }
+
+        public async Task<DeleteClassViewModel?> GetClassForDeleteByIdAsync(Guid id)
+        {
+            DeleteClassViewModel? classToDelete = await this.classRepository
+                .GetAllAttached()
+                .Where(c => c.IsDeleted == false)
+                .To<DeleteClassViewModel>()
+                .FirstOrDefaultAsync(c => c.Id.ToLower() == id.ToString().ToLower());
+
+            return classToDelete;
+        }
+
+        public async Task<bool> SoftDeleteClassAsync(Guid id)
+        {
+            Class? classToDelete = await this.classRepository
+                .FirstOrDefaultAsync(c => c.Id.ToString().ToLower() == id.ToString().ToLower());
+
+            if (classRepository == null)
+            {
+                return false;
+            }
+
+            classToDelete.IsDeleted = true;
+            return await this.classRepository.UpdateAsync(classToDelete);
+        }
     }
 }

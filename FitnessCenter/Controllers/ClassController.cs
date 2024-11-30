@@ -1,5 +1,6 @@
 ﻿namespace FitnessCenter.Web.Controllers
 {
+    using FitnessCenter.Web.ViewModels.Gym;
     using Microsoft.AspNetCore.Authorization;
     using Microsoft.AspNetCore.Mvc;
     using Services.Data.Interfaces;
@@ -216,6 +217,63 @@
                 await this.classService.GetAllClassesAsync();
 
             return this.View(classes);
+        }
+
+        [HttpGet]
+        [Authorize]
+        public async Task<IActionResult> Delete(string? id)
+        {
+            bool isManager = await this.IsUserManagerAsync();
+            if (!isManager)
+            {
+                return this.RedirectToAction(nameof(Index));
+            }
+
+            Guid classGuid = Guid.Empty;
+
+            if (!this.IsGuidValid(id, ref classGuid))
+            {
+                return this.RedirectToAction(nameof(Manage));
+            }
+
+            DeleteClassViewModel? classToDeleteViewModel =
+                await this.classService.GetClassForDeleteByIdAsync(classGuid);
+
+            if (classToDeleteViewModel == null)
+            {
+                return this.RedirectToAction(nameof(Manage));
+            }
+
+            return this.View(classToDeleteViewModel);
+        }
+
+        [HttpPost]
+        [Authorize]
+        public async Task<IActionResult> SoftDeleteConfirmed(DeleteClassViewModel gym)
+        {
+            bool isManager = await this.IsUserManagerAsync();
+            if (!isManager)
+            {
+                return this.RedirectToAction(nameof(Index));
+            }
+
+            Guid classGuid = Guid.Empty;
+            if (!this.IsGuidValid(gym.Id, ref classGuid))
+            {
+                return this.RedirectToAction(nameof(Manage));
+            }
+
+            bool isDeleted = await this.classService
+                .SoftDeleteClassAsync(classGuid);
+
+            if (!isDeleted)
+            {
+                TempData["ErrorMessage"] =
+                    "Unexpected error occurred while trying to delete the class! Please contact system administrator!";
+                return this.RedirectToAction(nameof(Delete), new { id = gym.Id });
+            }
+
+            return this.RedirectToAction(nameof(Manage));
         }
     }
 }
