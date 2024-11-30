@@ -56,7 +56,8 @@ namespace FitnessCenter.Services.Data
                         .Select(gc => new GymClassViewModel()
                         {
                             Title = gc.Class.Title,
-                            Duration = gc.Class.Duration
+                            Duration = gc.Class.Duration,
+                            Description = gc.Class.Description
                         })
                         .ToArray()
                 };

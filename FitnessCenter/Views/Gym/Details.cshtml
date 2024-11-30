@@ -31,7 +31,7 @@
                         <div class="card-body d-flex flex-column">
                             <h5 class="card-title text-center font-weight-bold">@classM.Title</h5>
                             <p class="card-text"><strong>Duration:</strong> @classM.Duration</p>
-                            <p class="card-text text-justify" style="font-size: 0.9rem;">@classM.Description</p>
+                            <p class="card-text">@classM.Description</p>
                         </div>
                         <div class="card-footer bg-transparent text-center">
                             @if (await this.managerService.IsUserManagerAsync(this.User.GetUserId()))
