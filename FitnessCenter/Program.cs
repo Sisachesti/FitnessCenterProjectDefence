@@ -49,6 +49,7 @@ namespace FitnessCenter
             builder.Services.AddScoped<IManagerService, ManagerService>();
             builder.Services.AddScoped<IClassService, ClassService>();
             builder.Services.AddScoped<IPlanService, PlanService>();
+            builder.Services.AddScoped<IUserService, UserService>();
 
             // Add services to the container.
             builder.Services.AddControllersWithViews();
