@@ -17,6 +17,7 @@ namespace FitnessCenter
         {
             WebApplicationBuilder builder = WebApplication.CreateBuilder(args);
             string connectionString = builder.Configuration.GetConnectionString("SQLServer") ?? throw new InvalidOperationException("Connection string 'SQLServer' not found.");
+            
             string adminEmail = builder.Configuration.GetValue<string>("Administrator:Email")!;
             string adminUsername = builder.Configuration.GetValue<string>("Administrator:Username")!;
             string adminPassword = builder.Configuration.GetValue<string>("Administrator:Password")!;
@@ -72,6 +73,8 @@ namespace FitnessCenter
 
             app.UseAuthentication();
             app.UseAuthorization();
+
+            app.SeedAdministrator(adminEmail, adminUsername, adminPassword);
 
             app.UseStatusCodePagesWithRedirects("/Home/Error/{0}");
 
