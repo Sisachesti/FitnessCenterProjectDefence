@@ -15,7 +15,7 @@ namespace FitnessCenter.Services.Data
             this.gymClassRepository = gymClassRepository;
         }
 
-        public async Task<bool> SetAvailableTicketsAsync(SetAvailableSubscribtionsViewModel model)
+        public async Task<bool> SetAvailableSubscribtionsAsync(SetAvailableSubscribtionsViewModel model)
         {
             GymClass gymClass = AutoMapperConfig.MapperInstance
                 .Map<GymClass>(model);

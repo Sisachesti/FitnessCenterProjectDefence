@@ -3,6 +3,6 @@
     using FitnessCenter.Web.ViewModels.GymClass;
     public interface ISubscribtionService
     {
-        public Task<bool> SetAvailableTicketsAsync(SetAvailableSubscribtionsViewModel model);
+        public Task<bool> SetAvailableSubscribtionsAsync(SetAvailableSubscribtionsViewModel model);
     }
 }
