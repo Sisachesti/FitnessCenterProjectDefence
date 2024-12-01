@@ -17,11 +17,7 @@ namespace FitnessCenter
         {
             WebApplicationBuilder builder = WebApplication.CreateBuilder(args);
             string connectionString = builder.Configuration.GetConnectionString("SQLServer") ?? throw new InvalidOperationException("Connection string 'SQLServer' not found.");
-            
-            string adminEmail = builder.Configuration.GetValue<string>("Administrator:Email")!;
-            string adminUsername = builder.Configuration.GetValue<string>("Administrator:Username")!;
-            string adminPassword = builder.Configuration.GetValue<string>("Administrator:Password")!;
-
+           
             builder.Services
                 .AddDbContext<FitnessCenterDbContext>(options =>
                 {
@@ -75,7 +71,7 @@ namespace FitnessCenter
             app.UseAuthentication();
             app.UseAuthorization();
 
-            app.SeedAdministrator(adminEmail, adminUsername, adminPassword);
+            ConfigureAdmin(builder, app);
 
             app.UseStatusCodePagesWithRedirects("/Home/Error/{0}");
 
@@ -118,6 +114,15 @@ namespace FitnessCenter
 
             cfg.User.RequireUniqueEmail =
                 builder.Configuration.GetValue<bool>("Identity:User:RequireUniqueEmail");
+        }
+
+        private static void ConfigureAdmin(WebApplicationBuilder builder, WebApplication app)
+        {
+            string adminEmail = builder.Configuration.GetValue<string>("Administrator:Email")!;
+            string adminUsername = builder.Configuration.GetValue<string>("Administrator:Username")!;
+            string adminPassword = builder.Configuration.GetValue<string>("Administrator:Password")!;
+
+            app.SeedAdministrator(adminEmail, adminUsername, adminPassword);
         }
     }
 }
