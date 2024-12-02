@@ -19,6 +19,8 @@ namespace FitnessCenter.Web.ViewModels.Class
 
         public bool IsDeleted { get; set; }
 
+        public string? ImageUrl { get; set; }
+
         public void CreateMappings(IProfileExpression configuration)
         {
             configuration.CreateMap<Class, AllClassesIndexViewModel>()

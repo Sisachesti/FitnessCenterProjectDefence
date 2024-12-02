@@ -1,10 +1,28 @@
-﻿﻿@using FitnessCenter.Web.ViewModels.Class
+﻿﻿@using FitnessCenter.Services.Data.Interfaces
+@using FitnessCenter.Web.Infrastructure.Extensions
+@using FitnessCenter.Web.ViewModels.Class
 @model ClassDetailsViewModel
+
+@inject IManagerService managerService
 
 <h2>@Model.Title</h2>
 
+<div style="text-align: center;">
+    <img src="@Model.ImageUrl" alt="@Model.Title" width="100" style="border: 2px solid gray;" />
+</div>
 <p><strong>Duration:</strong> @Model.Duration minutes</p>
 <p><strong>Description:</strong> @Model.Description</p>
 <p><strong>Starting date:</strong> On @Model.StartingDate</p>
 
 <a asp-action="Index" class="btn btn-primary">Back to All Classes</a>
+
+@if (User?.Identity?.IsAuthenticated ?? false)
+{
+    if (!await this.managerService.IsUserManagerAsync(this.User.GetUserId()))
+    {
+        <form asp-controller="Plan" asp-action="AddToPlans" method="post" class="d-inline">
+            <input type="hidden" name="classId" value="@Model.Id" />
+            <button type="submit" class="btn btn-warning">+Add To Plans</button>
+        </form>
+    }
+}

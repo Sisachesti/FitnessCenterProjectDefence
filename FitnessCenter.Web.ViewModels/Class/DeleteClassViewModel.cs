@@ -13,7 +13,7 @@ namespace FitnessCenter.Web.ViewModels.Class
 
         public string Title { get; set; } = null!;
 
-        public DateTime StartingDate { get; set; }
+        public string StartingDate { get; set; } = null!;
 
         public int Duration { get; set; }
 
@@ -25,7 +25,7 @@ namespace FitnessCenter.Web.ViewModels.Class
 
         public void CreateMappings(IProfileExpression configuration)
         {
-            configuration.CreateMap<Class, EditClassFormModel>()
+            configuration.CreateMap<Class, DeleteClassViewModel>()
                 .ForMember(d => d.StartingDate,
                     opt => opt.MapFrom(s => s.StartingDate.ToString(StartingDateFormat, CultureInfo.InvariantCulture)));
         }

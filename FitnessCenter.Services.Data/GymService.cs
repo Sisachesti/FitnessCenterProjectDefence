@@ -57,7 +57,8 @@ namespace FitnessCenter.Services.Data
                         {
                             Title = gc.Class.Title,
                             Duration = gc.Class.Duration,
-                            Description = gc.Class.Description
+                            Description = gc.Class.Description,
+                            ImageUrl = gc.Class.ImageUrl
                         })
                         .ToArray()
                 };

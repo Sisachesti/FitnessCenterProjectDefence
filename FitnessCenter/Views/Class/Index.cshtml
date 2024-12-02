@@ -19,7 +19,7 @@
 
 @if (await this.managerService.IsUserManagerAsync(this.User.GetUserId()))
 {
-    <a asp-action="Create" class="btn btn-success mb-4">Add New Class</a>
+    <a asp-action="Manage" class="btn btn-outline-primary mb-4">Mange Classes</a>
 }
 
 <table class="table table-striped">
@@ -37,18 +37,27 @@
             if (classM.IsDeleted == false)
             {
                 <tr>
+                    <td>
+                        <div style="text-align: center;">
+                            <img src="@classM.ImageUrl" alt="@classM.Title" width="100" style="border: 2px solid gray;" />
+                        </div>
+                    </td>
                 <td>@classM.Title</td>
                 <td>@classM.StartingDate</td>
                 <td>@classM.Duration minutes</td>
-                <td>
-                    <a asp-action="Details" asp-route-id="@classM.Id" class="btn btn-info">Details</a>
+                    <td>
+                        <a asp-action="Details" asp-route-id="@classM.Id" class="btn btn-info"><i class="bi bi-info-circle-fill"></i> Details</a>
+                    
 
                     @if (User?.Identity?.IsAuthenticated ?? false)
                     {
-                        <form asp-controller="Plan" asp-action="AddToPlans" method="post" class="d-inline">
+                        if (!await this.managerService.IsUserManagerAsync(this.User.GetUserId()))
+                        {
+                            <form asp-controller="Plan" asp-action="AddToPlans" method="post" class="d-inline">
                             <input type="hidden" name="classId" value="@classM.Id" />
                             <button type="submit" class="btn btn-warning">+Plans</button>
-                        </form>
+                            </form>
+                        }
                     }
                 </td>
             </tr>
@@ -62,6 +71,9 @@
 {
     @if (await this.managerService.IsUserManagerAsync(this.User.GetUserId()))
     {
-        <a asp-action="Create" class="btn btn-primary">Add New Class</a>
+        <div class="pb-3">
+            <a asp-action="Create" class="btn btn-primary">Add New Class</a>
+            </div>
+        
     }
 }

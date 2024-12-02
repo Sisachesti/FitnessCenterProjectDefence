@@ -15,13 +15,17 @@ namespace FitnessCenter.Web.ViewModels.Class
 
         public string Description { get; set; } = null!;
 
+        public string? ImageUrl { get; set; }
+
         public int AvailableSubscriptions { get; set; }
 
         public void CreateMappings(IProfileExpression configuration)
         {
             configuration.CreateMap<Class, GymClassViewModel>()
                 .ForMember(d => d.Description,
-                    opt => opt.MapFrom(s => s.Description));
+                    opt => opt.MapFrom(s => s.Description))
+                .ForMember(d => d.ImageUrl,
+                    opt => opt.MapFrom(s => s.ImageUrl));
         }
     }
 }
