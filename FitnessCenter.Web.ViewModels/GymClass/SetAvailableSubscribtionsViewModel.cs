@@ -9,13 +9,13 @@ namespace FitnessCenter.Web.ViewModels.GymClass
     public class SetAvailableSubscribtionsViewModel : IMapTo<GymClass>
     {
         [Required]
-        public string CinemaId { get; set; } = null!;
+        public string GymId { get; set; } = null!;
 
         [Required]
-        public string MovieId { get; set; } = null!;
+        public string ClassId { get; set; } = null!;
 
         [Required(ErrorMessage = AvailableSubscribtionsRequiredMessage)]
         [Range(AvailableSubscribtionsMinValue, AvailableSubscribtionsMaxValue, ErrorMessage = AvailableSubscribtionsRangeMessage)]
-        public int AvailableTickets { get; set; }
+        public int AvailableSubscribtions { get; set; }
     }
 }
