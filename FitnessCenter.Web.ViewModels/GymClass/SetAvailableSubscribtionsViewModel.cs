@@ -1,11 +1,13 @@
-﻿using System.ComponentModel.DataAnnotations;
-using static FitnessCenter.Common.EntityValidationMessages.GymClass;
+﻿using FitnessCenter.Services.Mapping;
+using System.ComponentModel.DataAnnotations;
 using static FitnessCenter.Common.EntityValidationConstants.GymClass;
-using FitnessCenter.Services.Mapping;
+using static FitnessCenter.Common.EntityValidationMessages.GymClass;
 
 namespace FitnessCenter.Web.ViewModels.GymClass
 {
+    using AutoMapper;
     using Data.Models;
+
     public class SetAvailableSubscribtionsViewModel : IMapTo<GymClass>
     {
         [Required]

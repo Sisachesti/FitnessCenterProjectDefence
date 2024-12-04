@@ -70,7 +70,7 @@ namespace FitnessCenter.Data.Migrations
                 });
 
             migrationBuilder.CreateTable(
-                name: "Subscriptions",
+                name: "Subscribtions",
                 columns: table => new
                 {
                     Id = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
@@ -81,21 +81,21 @@ namespace FitnessCenter.Data.Migrations
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_Subscriptions", x => x.Id);
+                    table.PrimaryKey("PK_Subscribtions", x => x.Id);
                     table.ForeignKey(
-                        name: "FK_Subscriptions_AspNetUsers_UserId",
+                        name: "FK_Subscribtions_AspNetUsers_UserId",
                         column: x => x.UserId,
                         principalTable: "AspNetUsers",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
                     table.ForeignKey(
-                        name: "FK_Subscriptions_Classes_ClassId",
+                        name: "FK_Subscribtions_Classes_ClassId",
                         column: x => x.ClassId,
                         principalTable: "Classes",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
                     table.ForeignKey(
-                        name: "FK_Subscriptions_Gyms_GymId",
+                        name: "FK_Subscribtions_Gyms_GymId",
                         column: x => x.GymId,
                         principalTable: "Gyms",
                         principalColumn: "Id",
@@ -129,18 +129,18 @@ namespace FitnessCenter.Data.Migrations
                 unique: true);
 
             migrationBuilder.CreateIndex(
-                name: "IX_Subscriptions_ClassId",
-                table: "Subscriptions",
+                name: "IX_Subscribtions_ClassId",
+                table: "Subscribtions",
                 column: "ClassId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_Subscriptions_GymId",
-                table: "Subscriptions",
+                name: "IX_Subscribtions_GymId",
+                table: "Subscribtions",
                 column: "GymId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_Subscriptions_UserId",
-                table: "Subscriptions",
+                name: "IX_Subscribtions_UserId",
+                table: "Subscribtions",
                 column: "UserId");
         }
 
@@ -151,7 +151,7 @@ namespace FitnessCenter.Data.Migrations
                 name: "Managers");
 
             migrationBuilder.DropTable(
-                name: "Subscriptions");
+                name: "Subscribtions");
 
             migrationBuilder.DeleteData(
                 table: "Classes",

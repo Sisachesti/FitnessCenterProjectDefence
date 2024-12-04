@@ -141,7 +141,7 @@ namespace FitnessCenter.Data.Migrations
                     b.HasData(
                         new
                         {
-                            Id = new Guid("93d45f4f-4c80-4ac2-9b26-4ec28efbb8a1"),
+                            Id = new Guid("20e4e776-ec0f-4e00-9862-43c2f157de16"),
                             Description = "Perfect for beginners or those seeking a calming, slower-paced practice. This class focuses on foundational poses, gentle stretches, and breathwork to enhance flexibility and relaxation. No prior experience needed.",
                             Duration = 90,
                             IsDeleted = false,
@@ -150,7 +150,7 @@ namespace FitnessCenter.Data.Migrations
                         },
                         new
                         {
-                            Id = new Guid("657ca1bd-4512-4e18-8b5a-c6c34ce4aa0e"),
+                            Id = new Guid("a9d77ddf-a864-4ade-b770-e250283b9829"),
                             Description = "A well-rounded workout targeting all major muscle groups. Incorporates free weights, resistance machines, and bodyweight exercises to improve overall strength, endurance, and stability. Suitable for all levels, with modifications available.",
                             Duration = 70,
                             IsDeleted = false,
@@ -159,7 +159,7 @@ namespace FitnessCenter.Data.Migrations
                         },
                         new
                         {
-                            Id = new Guid("24d76137-7b6c-49d1-a573-43f1c1692c48"),
+                            Id = new Guid("389d516a-8913-4e76-ad53-4c4b5e99788a"),
                             Description = "A basketball training program is a specialized practice designed to improve an individual's skillset. It typically involves drills and exercises focused on developing specific areas, such as ball handling, shooting, passing, and agility.",
                             Duration = 120,
                             IsDeleted = false,
@@ -194,28 +194,28 @@ namespace FitnessCenter.Data.Migrations
                     b.HasData(
                         new
                         {
-                            Id = new Guid("f0535e06-c7c9-438b-8425-50d1cebb7b28"),
+                            Id = new Guid("65bdc283-4215-404c-94c7-76c8093e04d1"),
                             IsDeleted = false,
                             Location = "Yambol",
                             Name = "Gladiator"
                         },
                         new
                         {
-                            Id = new Guid("5b1cd1e8-5c6e-4dfa-b6b8-4f1c6afdadf5"),
+                            Id = new Guid("938ff034-3f60-4754-8f8d-9578a4ee0b31"),
                             IsDeleted = false,
                             Location = "Yambol",
                             Name = "Flex"
                         },
                         new
                         {
-                            Id = new Guid("f30c8fe8-d60c-4807-a225-1db9e0e8f9f0"),
+                            Id = new Guid("5d641350-82d5-46cc-ab61-4884af9d02bc"),
                             IsDeleted = false,
                             Location = "Yambol",
                             Name = "Olimpia"
                         },
                         new
                         {
-                            Id = new Guid("fd59b75d-7bbd-4cb8-94ff-ba80a9dc0fff"),
+                            Id = new Guid("68d5ea2e-1076-4b94-83f2-32e76bd44260"),
                             IsDeleted = false,
                             Location = "Plovdiv",
                             Name = "Pulse Fitness"
@@ -231,7 +231,9 @@ namespace FitnessCenter.Data.Migrations
                         .HasColumnType("uniqueidentifier");
 
                     b.Property<int>("AvailableSubscribtions")
-                        .HasColumnType("int");
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int")
+                        .HasDefaultValue(0);
 
                     b.Property<bool>("IsDeleted")
                         .ValueGeneratedOnAdd()
@@ -293,7 +295,7 @@ namespace FitnessCenter.Data.Migrations
 
                     b.HasIndex("UserId");
 
-                    b.ToTable("Subscriptions");
+                    b.ToTable("Subscribtions");
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRole<System.Guid>", b =>

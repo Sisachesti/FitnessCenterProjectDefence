@@ -5,7 +5,7 @@ namespace FitnessCenter.Web.ViewModels.Class
     using AutoMapper;
     using Data.Models;
 
-    public class GymClassViewModel : IMapFrom<Class>, IHaveCustomMappings
+    public class GymClassViewModel : IMapFrom<Class>
     {
         public string Id { get; set; } = null!;
 
@@ -17,15 +17,6 @@ namespace FitnessCenter.Web.ViewModels.Class
 
         public string? ImageUrl { get; set; }
 
-        public int AvailableSubscriptions { get; set; }
-
-        public void CreateMappings(IProfileExpression configuration)
-        {
-            configuration.CreateMap<Class, GymClassViewModel>()
-                .ForMember(d => d.Description,
-                    opt => opt.MapFrom(s => s.Description))
-                .ForMember(d => d.ImageUrl,
-                    opt => opt.MapFrom(s => s.ImageUrl));
-        }
+        public int AvailableSubscribtions { get; set; }
     }
 }

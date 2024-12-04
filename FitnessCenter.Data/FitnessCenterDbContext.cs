@@ -27,7 +27,7 @@ namespace FitnessCenter.Data
 
         public virtual DbSet<ApplicationUserClass> UsersClasses { get; set; } = null!;
 
-        public virtual DbSet<Subscribtion> Subscriptions { get; set; } = null!;
+        public virtual DbSet<Subscribtion> Subscribtions { get; set; } = null!;
 
         public virtual DbSet<Manager> Managers { get; set; } = null!;
 

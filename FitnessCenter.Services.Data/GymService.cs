@@ -49,16 +49,19 @@ namespace FitnessCenter.Services.Data
             {
                 viewModel = new GymDetailsViewModel()
                 {
+                    Id = gym.Id.ToString(),
                     Name = gym.Name,
                     Location = gym.Location,
                     Classes = gym.GymClasses
                         .Where(gc => gc.IsDeleted == false)
                         .Select(gc => new GymClassViewModel()
                         {
+                            Id = gc.Class.Id.ToString(),
                             Title = gc.Class.Title,
                             Duration = gc.Class.Duration,
                             Description = gc.Class.Description,
-                            ImageUrl = gc.Class.ImageUrl
+                            ImageUrl = gc.Class.ImageUrl,
+                            AvailableSubscribtions = gc.AvailableSubscribtions
                         })
                         .ToArray()
                 };

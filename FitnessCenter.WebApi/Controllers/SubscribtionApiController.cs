@@ -5,6 +5,7 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace FitnessCenter.WebApi.Controllers
 {
+    using FitnessCenter.Web.Infrastructure.Attributes;
     using Microsoft.AspNetCore.Authorization;
     //using Web.Infrastructure.Attributes;
 
@@ -25,7 +26,7 @@ namespace FitnessCenter.WebApi.Controllers
         }
 
         [HttpGet("[action]/{id?}")]
-        //[ManagerOnly]
+        [ManagerOnly]
         [ProducesResponseType(typeof(GymDetailsViewModel), StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status401Unauthorized)]
@@ -51,6 +52,7 @@ namespace FitnessCenter.WebApi.Controllers
         }
 
         [HttpPost("[action]")]
+        [ManagerOnly]
         [ProducesResponseType(typeof(string), StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status401Unauthorized)]
@@ -91,6 +93,7 @@ namespace FitnessCenter.WebApi.Controllers
 
             AvailableSubscribtionsViewModel? availableSubscribtionsViewModel = await this.classService
                 .GetAvailableSubscribtionsByIdAsync(gymGuid, classGuid);
+
             if (availableSubscribtionsViewModel == null)
             {
                 return this.BadRequest();

@@ -1,11 +1,11 @@
-﻿using FitnessCenter.Data.Models;
-using FitnessCenter.Data.Repository.Interfaces;
-using FitnessCenter.Services.Data.Interfaces;
-using FitnessCenter.Services.Mapping;
-using FitnessCenter.Web.ViewModels.GymClass;
-
-namespace FitnessCenter.Services.Data
+﻿namespace FitnessCenter.Services.Data
 {
+    using FitnessCenter.Data.Models;
+    using FitnessCenter.Data.Repository.Interfaces;
+    using FitnessCenter.Services.Mapping;
+    using Interfaces;
+    using Web.ViewModels.GymClass;
+
     public class SubscribtionService : BaseService, ISubscribtionService
     {
         private readonly IRepository<GymClass, object> gymClassRepository;
@@ -17,6 +17,8 @@ namespace FitnessCenter.Services.Data
 
         public async Task<bool> SetAvailableSubscribtionsAsync(SetAvailableSubscribtionsViewModel model)
         {
+
+
             GymClass gymClass = AutoMapperConfig.MapperInstance
                 .Map<GymClass>(model);
 

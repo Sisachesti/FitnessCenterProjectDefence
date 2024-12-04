@@ -13,23 +13,28 @@ namespace FitnessCenter.Data.Configuration
     {
         public void Configure(EntityTypeBuilder<GymClass> builder)
         {
-            builder.HasKey(cm => new { cm.GymId, cm.ClassId });
+            builder.HasKey(gc => new { gc.GymId, gc.ClassId });
 
             builder
-                .Property(cm => cm.IsDeleted)
+                .Property(gc => gc.IsDeleted)
                 .HasDefaultValue(false);
 
             builder
-                .HasOne(cm => cm.Class)
-                .WithMany(m => m.ClassGyms)
-                .HasForeignKey(cm => cm.ClassId)
+                .HasOne(gc => gc.Class)
+                .WithMany(c => c.ClassGyms)
+                .HasForeignKey(gc => gc.ClassId)
                 .OnDelete(DeleteBehavior.Restrict);
 
             builder
-                .HasOne(cm => cm.Gym)
-                .WithMany(c => c.GymClasses)
-                .HasForeignKey(cm => cm.GymId)
+                .HasOne(gc => gc.Gym)
+                .WithMany(g => g.GymClasses)
+                .HasForeignKey(gc => gc.GymId)
                 .OnDelete(DeleteBehavior.Restrict);
+
+            builder
+                .Property(gc => gc.AvailableSubscribtions)
+                .IsRequired(true)
+                .HasDefaultValue(0);
         }
     }
 }

@@ -1,7 +1,9 @@
 using FitnessCenter.Data;
 using FitnessCenter.Data.Models;
+using FitnessCenter.Models;
 using FitnessCenter.Services.Data;
 using FitnessCenter.Services.Data.Interfaces;
+using FitnessCenter.Services.Mapping;
 using FitnessCenter.Web.Infrastructure.Extensions;
 using Microsoft.EntityFrameworkCore;
 
@@ -12,8 +14,8 @@ namespace FitnessCenter.WebApi
         public static void Main(string[] args)
         {
             var builder = WebApplication.CreateBuilder(args);
-            string connectionString = builder.Configuration.GetConnectionString("SQLServer")!;
             string? fitnessCenterWebAppOrigin = builder.Configuration.GetValue<string>("Client Origins:FitnessCenterWebApp");
+            string connectionString = builder.Configuration.GetConnectionString("SQLServer")!;
 
             // Add services to the container.
             builder.Services
@@ -27,6 +29,29 @@ namespace FitnessCenter.WebApi
             builder.Services.AddEndpointsApiExplorer();
             builder.Services.AddSwaggerGen();
 
+            builder.Services.AddCors(cfg =>
+            {
+                cfg.AddPolicy("AllowAll", policyBld =>
+                {
+                    policyBld
+                        .AllowAnyHeader()
+                        .AllowAnyMethod()
+                        .AllowAnyOrigin();
+                });
+
+                if (!String.IsNullOrWhiteSpace(fitnessCenterWebAppOrigin))
+                {
+                    cfg.AddPolicy("AllowMyServer", policyBld =>
+                    {
+                        policyBld
+                            .AllowAnyHeader()
+                            .AllowAnyMethod()
+                            .AllowCredentials()
+                            .WithOrigins(fitnessCenterWebAppOrigin);
+                    });
+                }
+            });
+
             builder.Services.RegisterRepositories(typeof(ApplicationUser).Assembly);
 
             builder.Services.AddScoped<IGymService, GymService>();
@@ -36,6 +61,8 @@ namespace FitnessCenter.WebApi
             builder.Services.AddScoped<ISubscribtionService, SubscribtionService>();
 
             var app = builder.Build();
+
+            AutoMapperConfig.RegisterMappings(typeof(ErrorViewModel).Assembly);
 
             // Configure the HTTP request pipeline.
             if (app.Environment.IsDevelopment())
@@ -48,6 +75,10 @@ namespace FitnessCenter.WebApi
 
             app.UseAuthorization();
 
+            if (!String.IsNullOrWhiteSpace(fitnessCenterWebAppOrigin))
+            {
+                app.UseCors("AllowMyServer");
+            }
 
             app.MapControllers();
 
