@@ -10,11 +10,13 @@ namespace FitnessCenter.Common
     {
         public static class Class
         {
+            public const int IdMinLength = 36;
+            public const int IdMaxLength = 36;
             public const int TitleMaxLength = 50;
             public const int DurationMinValue = 1;
             public const int DurationMaxValue = 999;
             public const string StartingDateFormat = "MM/dd HH:mm";
-            public const int DescriptionMinLength = 50;
+            public const int DescriptionMinLength = 5;
             public const int DescriptionMaxLength = 500;
             public const int ImageUrlMinLength = 8;
             public const int ImageUrlMaxLength = 2083;

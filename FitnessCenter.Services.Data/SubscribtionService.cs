@@ -17,8 +17,6 @@
 
         public async Task<bool> SetAvailableSubscribtionsAsync(SetAvailableSubscribtionsViewModel model)
         {
-
-
             GymClass gymClass = AutoMapperConfig.MapperInstance
                 .Map<GymClass>(model);
 

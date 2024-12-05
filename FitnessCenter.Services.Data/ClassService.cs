@@ -15,6 +15,7 @@ namespace FitnessCenter.Services.Data
     using System.Globalization;
     using static Common.EntityValidationConstants.Class;
     using static Common.ApplicationConstants;
+    using System.Text.RegularExpressions;
 
     public class ClassService : BaseService, IClassService
     {
@@ -31,10 +32,26 @@ namespace FitnessCenter.Services.Data
             this.gymClassRepository = gymClassRepository;
         }
 
-        public async Task<IEnumerable<AllClassesIndexViewModel>> GetAllClassesAsync()
+        public async Task<IEnumerable<AllClassesIndexViewModel>> GetAllClassesAsync(AllClassesSearchFilterViewModel inputModel)
         {
-            return await classRepository
-                .GetAllAttached()
+            IQueryable<Class> allClassesQuery = this.classRepository
+                .GetAllAttached();
+
+            if (!String.IsNullOrWhiteSpace(inputModel.SearchQuery))
+            {
+                allClassesQuery = allClassesQuery
+                    .Where(m => m.Title.ToLower().Contains(inputModel.SearchQuery.ToLower()));
+            }
+
+            if (inputModel.CurrentPage.HasValue &&
+                inputModel.EntitiesPerPage.HasValue)
+            {
+                allClassesQuery = allClassesQuery
+                    .Skip(inputModel.EntitiesPerPage.Value * (inputModel.CurrentPage.Value - 1))
+                    .Take(inputModel.EntitiesPerPage.Value);
+            }
+
+            return await allClassesQuery
                 .To<AllClassesIndexViewModel>()
                 .ToArrayAsync();
         }
@@ -264,6 +281,20 @@ namespace FitnessCenter.Services.Data
 
             classToDelete.IsDeleted = true;
             return await this.classRepository.UpdateAsync(classToDelete);
+        }
+
+        public async Task<int> GetClassesCountByFilterAsync(AllClassesSearchFilterViewModel inputModel)
+        {
+            AllClassesSearchFilterViewModel inputModelCopy = new AllClassesSearchFilterViewModel()
+            {
+                CurrentPage = null,
+                EntitiesPerPage = null,
+                SearchQuery = inputModel.SearchQuery
+            };
+
+            int classesCount = (await this.GetAllClassesAsync(inputModelCopy))
+                .Count();
+            return classesCount;
         }
     }
 }

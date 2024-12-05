@@ -43,7 +43,7 @@
                                     <i class="bi bi-subscribtion-perforated"></i> Manage Subscribtions
                                 </button>
                             }
-                            else
+                            else if (User?.Identity?.IsAuthenticated ?? false)
                             {
                                 <button type="button" class="btn btn-success btn-sm" onclick="buySubscribtionsModal('@Model.Id', '@classM.Id')">
                                     <i class="bi bi-subscribtion-perforated"></i> Buy Subscribtions

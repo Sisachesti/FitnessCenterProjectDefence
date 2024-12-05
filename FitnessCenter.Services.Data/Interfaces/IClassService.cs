@@ -6,7 +6,7 @@ namespace FitnessCenter.Services.Data.Interfaces
 {
     public interface IClassService
     {
-        Task<IEnumerable<AllClassesIndexViewModel>> GetAllClassesAsync();
+        Task<IEnumerable<AllClassesIndexViewModel>> GetAllClassesAsync(AllClassesSearchFilterViewModel inputModel);
 
         Task<bool> AddClassAsync(AddClassInputModel inputModel);
 
@@ -25,5 +25,7 @@ namespace FitnessCenter.Services.Data.Interfaces
         Task<DeleteClassViewModel?> GetClassForDeleteByIdAsync(Guid id);
 
         Task<bool> SoftDeleteClassAsync(Guid id);
+
+        Task<int> GetClassesCountByFilterAsync(AllClassesSearchFilterViewModel inputModel);
     }
 }

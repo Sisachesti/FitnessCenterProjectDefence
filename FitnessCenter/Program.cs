@@ -71,7 +71,10 @@ namespace FitnessCenter
             app.UseAuthentication();
             app.UseAuthorization();
 
-            ConfigureAdmin(builder, app);
+            if (app.Environment.IsDevelopment())
+            {
+                ConfigureAdmin(builder, app);
+            }
 
             app.UseStatusCodePagesWithRedirects("/Home/Error/{0}");
 

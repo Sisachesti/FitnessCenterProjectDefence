@@ -4,7 +4,7 @@
 @using static FitnessCenter.Common.ErrorMessages.Plans
 @using static FitnessCenter.Common.EntityValidationConstants.Class
 
-@model IEnumerable<AllClassesIndexViewModel>
+@model AllClassesSearchFilterViewModel
 
 @inject IManagerService managerService
 
@@ -16,6 +16,17 @@
 }
 
 <h2>Classes</h2>
+
+<form method="get" asp-action="Index" class="mb-4">
+    <div class="row">
+        <div class="col">
+            <input asp-for="SearchQuery" class="form-control" placeholder="Search by title..." />
+        </div>
+        <div class="col">
+            <button type="submit" class="btn btn-primary">Filter</button>
+        </div>
+    </div>
+</form>
 
 @if (await this.managerService.IsUserManagerAsync(this.User.GetUserId()))
 {
@@ -32,37 +43,44 @@
         </tr>
     </thead>
     <tbody>
-        @foreach (AllClassesIndexViewModel classM in Model)
+        @if (Model.Classes != null)
         {
-            if (classM.IsDeleted == false)
+            @foreach (AllClassesIndexViewModel classM in Model.Classes)
             {
                 <tr>
                     <td>
-                        <div style="text-align: center;">
-                            <img src="@classM.ImageUrl" alt="@classM.Title" width="100" style="border: 2px solid gray;" />
-                        </div>
+                        @if (!string.IsNullOrEmpty(classM.ImageUrl))
+                        {
+                            <img src="@classM.ImageUrl" alt="@classM.Title" style="width: 100px; height: auto;" />
+                        }
+                        else
+                        {
+                            <span>No Image Available</span>
+                        }
                     </td>
-                <td>@classM.Title</td>
-                <td>@classM.StartingDate</td>
-                <td>@classM.Duration minutes</td>
+                    <td>@classM.Title</td>
+                    <td>@classM.StartingDate</td>
+                    <td>@classM.Duration minutes</td>
                     <td>
-                        <a asp-action="Details" asp-route-id="@classM.Id" class="btn btn-info"><i class="bi bi-info-circle-fill"></i> Details</a>
-                    
+                        <a asp-action="Details" asp-route-id="@classM.Id" class="btn btn-info">Details</a>
 
-                    @if (User?.Identity?.IsAuthenticated ?? false)
-                    {
-                        if (!await this.managerService.IsUserManagerAsync(this.User.GetUserId()))
+                        @if (User?.Identity?.IsAuthenticated ?? false)
                         {
                             <form asp-controller="Plan" asp-action="AddToPlans" method="post" class="d-inline">
-                            <input type="hidden" name="classId" value="@classM.Id" />
-                            <button type="submit" class="btn btn-warning">+Plans</button>
+                                <input type="hidden" name="classId" value="@classM.Id" />
+                                <button type="submit" class="btn btn-warning">+Add To Plans</button>
                             </form>
+
+                            @if (await this.managerService.IsUserManagerAsync(this.User.GetUserId()))
+                            {
+                                <a asp-action="AddToProgram" asp-route-id="@classM.Id" class="btn btn-info">Add to Program</a>
+                                <a asp-action="Edit" asp-route-id="@classM.Id" class="btn btn-primary">Edit</a>
+                                <a asp-action="Delete" asp-route-id="@classM.Id" class="btn btn-danger">Delete</a>
+                            }
                         }
-                    }
-                </td>
-            </tr>
+                    </td>
+                </tr>
             }
-            
         }
     </tbody>
 </table>
@@ -77,3 +95,41 @@
         
     }
 }
+
+
+<nav aria-label="Page navigation" class="mt-4">
+    <ul class="pagination">
+        @if (Model.CurrentPage > 1)
+        {
+            <li class="page-item">
+                <a class="page-link" asp-action="Index"
+                   asp-route-currentPage="@(Model.CurrentPage - 1)"
+                   asp-route-searchQuery="@Model.SearchQuery">
+                    Previous
+                </a>
+            </li>
+        }
+
+        @for (int i = 1; i <= Model.TotalPages; i++)
+        {
+            <li class="page-item @(i == Model.CurrentPage ? "active" : "")">
+                <a class="page-link" asp-action="Index"
+                   asp-route-currentPage="@i"
+                   asp-route-searchQuery="@Model.SearchQuery">
+                    @i
+                </a>
+            </li>
+        }
+
+        @if (Model.CurrentPage < Model.TotalPages)
+        {
+            <li class="page-item">
+                <a class="page-link" asp-action="Index"
+                   asp-route-currentPage="@(Model.CurrentPage + 1)"
+                   asp-route-searchQuery="@Model.SearchQuery">
+                    Next
+                </a>
+            </li>
+        }
+    </ul>
+</nav>

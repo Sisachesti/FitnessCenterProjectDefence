@@ -18,12 +18,22 @@
         }
 
         [HttpGet]
-        public async Task<IActionResult> Index()
+        public async Task<IActionResult> Index(AllClassesSearchFilterViewModel inputModel)
         {
             IEnumerable<AllClassesIndexViewModel> allClasses =
-                await this.classService.GetAllClassesAsync();
+                await this.classService.GetAllClassesAsync(inputModel);
 
-            return this.View(allClasses);
+            int allClassesCount = await this.classService.GetClassesCountByFilterAsync(inputModel);
+
+            AllClassesSearchFilterViewModel viewModel = new AllClassesSearchFilterViewModel
+            {
+                Classes = allClasses,
+                SearchQuery = inputModel.SearchQuery,
+                CurrentPage = inputModel.CurrentPage,
+                TotalPages = (int)Math.Ceiling((double)allClassesCount / inputModel.EntitiesPerPage!.Value)
+            };
+
+            return this.View(viewModel);
         }
 
         [HttpGet]
@@ -217,7 +227,7 @@
             }
 
             IEnumerable<AllClassesIndexViewModel> classes =
-                await this.classService.GetAllClassesAsync();
+                await this.classService.GetAllClassesAsync(new AllClassesSearchFilterViewModel());
 
             return this.View(classes);
         }
