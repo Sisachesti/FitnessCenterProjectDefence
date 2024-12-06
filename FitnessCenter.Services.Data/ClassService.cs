@@ -1,11 +1,7 @@
-﻿
-using static Azure.Core.HttpHeader;
-
-namespace FitnessCenter.Services.Data
+﻿namespace FitnessCenter.Services.Data
 {
     using FitnessCenter.Data.Models;
     using FitnessCenter.Data.Repository.Interfaces;
-    using FitnessCenter.Services.Data;
     using FitnessCenter.Services.Data.Interfaces;
     using FitnessCenter.Services.Mapping;
     using FitnessCenter.Web.ViewModels.Class;
@@ -13,9 +9,8 @@ namespace FitnessCenter.Services.Data
     using FitnessCenter.Web.ViewModels.GymClass;
     using Microsoft.EntityFrameworkCore;
     using System.Globalization;
-    using static Common.EntityValidationConstants.Class;
     using static Common.ApplicationConstants;
-    using System.Text.RegularExpressions;
+    using static Common.EntityValidationConstants.Class;
 
     public class ClassService : BaseService, IClassService
     {

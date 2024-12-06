@@ -1,3 +1,6 @@
+using System.Globalization;
+using FitnessCenter.Web.ViewModels.Gym;
+
 namespace FitnessCenter.Services.Tests
 {
     using FitnessCenter.Data.Models;
@@ -9,13 +12,14 @@ namespace FitnessCenter.Services.Tests
     using FitnessCenter.Web.ViewModels.Class;
     using MockQueryable;
     using Moq;
+    using static Common.EntityValidationConstants.Class;
 
     [TestFixture]
     public class Tests
     {
         private IList<Class> classesData = new List<Class>()
         {
-            new Class()
+                new Class()
                 {
                     Id = Guid.Parse("95766741-DE9A-4380-9D0A-3E2B22099004"),
                     Title = "Yoga Class",
@@ -335,6 +339,396 @@ namespace FitnessCenter.Services.Tests
             Assert.AreEqual("Gladiator", gymCheckBox.Name);
             Assert.AreEqual("Yambol", gymCheckBox.Location);
             Assert.True(gymCheckBox.IsSelected);
+        }
+
+        [Test]
+        public async Task GetAddClassToGymInputModelByIdNotSelectedNoGymClassesLinkedPositive()
+        {
+            IClassService classService = new ClassService(classRepository.Object, gymRepository.Object, gymClassRepository.Object);
+
+            Guid classId = Guid.Parse("07A8335B-49FD-4C8B-A802-F8A783F1E7CE");
+            Guid gymId = Guid.Parse("DA07CD2D-59B2-4572-A1EF-19BBBFDF4984");
+
+            var mockClass = new Class
+            {
+                Id = classId,
+                Title = "Full-Body Strength Training",
+                StartingDate = new DateTime(2024, 12, 13, 11, 00, 00),
+                Duration = 70,
+                Description = "A well-rounded workout targeting all major muscle groups.",
+                ImageUrl = "https://i0.wp.com/post.healthline.com/wp-content/uploads/2022/04/male-lifting-weight-1296x728-header.jpg?w=1155&h=1528"
+            };
+            var mockGymClasses = new List<GymClass>
+            {
+                new GymClass
+                {
+                    GymId = gymId,
+                    ClassId = classId,
+                    Class = mockClass,
+                    IsDeleted = false
+                }
+            };
+            var mockGym = new Gym()
+            {
+                Id = gymId,
+                Name = "Gladiator",
+                Location = "Yambol",
+                IsDeleted = false,
+                GymClasses = new List<GymClass>()
+            };
+
+            var gyms = new List<Gym>() { mockGym }.AsQueryable();
+
+            classRepository.Setup(r => r.GetByIdAsync(classId)).ReturnsAsync(mockClass);
+            gymRepository.Setup(r => r.GetAllAttached()).Returns(gyms.BuildMock());
+
+            AddClassToGymInputModel? result = await classService
+                .GetAddClassToGymInputModelByIdAsync(classId);
+
+            Assert.NotNull(result);
+            Assert.AreEqual(classId.ToString(), result.Id);
+            Assert.AreEqual("Full-Body Strength Training", result.Title);
+            Assert.NotNull(result.Gyms);
+
+            var gymCheckBox = result.Gyms.FirstOrDefault();
+            Assert.NotNull(gymCheckBox);
+            Assert.AreEqual(gymId.ToString(), gymCheckBox.Id);
+            Assert.AreEqual("Gladiator", gymCheckBox.Name);
+            Assert.AreEqual("Yambol", gymCheckBox.Location);
+            Assert.False(gymCheckBox.IsSelected);
+        }
+
+        [Test]
+        public async Task GetAddClassToGymInputModelByIdNotSelectedGymDeletedPositive()
+        {
+            IClassService classService = new ClassService(classRepository.Object, gymRepository.Object, gymClassRepository.Object);
+
+            Guid classId = Guid.Parse("07A8335B-49FD-4C8B-A802-F8A783F1E7CE");
+            Guid gymId = Guid.Parse("DA07CD2D-59B2-4572-A1EF-19BBBFDF4984");
+
+            var mockClass = new Class
+            {
+                Id = classId,
+                Title = "Full-Body Strength Training",
+                StartingDate = new DateTime(2024, 12, 13, 11, 00, 00),
+                Duration = 70,
+                Description = "A well-rounded workout targeting all major muscle groups.",
+                ImageUrl = "https://i0.wp.com/post.healthline.com/wp-content/uploads/2022/04/male-lifting-weight-1296x728-header.jpg?w=1155&h=1528"
+            };
+            var mockGymClasses = new List<GymClass>
+            {
+                new GymClass
+                {
+                    GymId = gymId,
+                    ClassId = classId,
+                    Class = mockClass,
+                    IsDeleted = false
+                }
+            };
+            var mockGym = new Gym()
+            {
+                Id = gymId,
+                Name = "Gladiator",
+                Location = "Yambol",
+                IsDeleted = true
+            };
+
+            var gyms = new List<Gym>() { mockGym }.AsQueryable();
+
+            classRepository.Setup(r => r.GetByIdAsync(classId)).ReturnsAsync(mockClass);
+            gymRepository.Setup(r => r.GetAllAttached()).Returns(gyms.BuildMock());
+
+            AddClassToGymInputModel? result = await classService
+                .GetAddClassToGymInputModelByIdAsync(classId);
+
+            Assert.NotNull(result);
+            Assert.AreEqual(classId.ToString(), result.Id);
+            Assert.AreEqual("Full-Body Strength Training", result.Title);
+            Assert.NotNull(result.Gyms);
+
+            var gymCheckBox = result.Gyms.FirstOrDefault();
+            Assert.Null(gymCheckBox);
+        }
+
+        [Test]
+        public async Task GetAddClassToGymInputModelByIdClassIsNullNegative()
+        {
+            IClassService classService = new ClassService(classRepository.Object, gymRepository.Object, gymClassRepository.Object);
+
+            AddClassToGymInputModel? result = await classService
+                .GetAddClassToGymInputModelByIdAsync(Guid.Empty);
+
+            Assert.Null(result);
+        }
+
+        [Test]
+        public async Task AddClassToGymsSelectedNoGymClassPositive()
+        {
+            IClassService classService = new ClassService(classRepository.Object, gymRepository.Object, gymClassRepository.Object);
+
+            Guid classId = Guid.Parse("07A8335B-49FD-4C8B-A802-F8A783F1E7CE");
+            Guid gymId = Guid.Parse("DA07CD2D-59B2-4572-A1EF-19BBBFDF4984");
+
+            Class mockClass = new Class
+            {
+                Id = classId,
+                Title = "Full-Body Strength Training",
+                StartingDate = new DateTime(2024, 12, 13, 11, 00, 00),
+                Duration = 70,
+                Description = "A well-rounded workout targeting all major muscle groups.",
+                ImageUrl = "https://i0.wp.com/post.healthline.com/wp-content/uploads/2022/04/male-lifting-weight-1296x728-header.jpg?w=1155&h=1528"
+            };
+            Gym mockGym = new Gym
+            {
+                Id = gymId,
+                Name = "Gladiator",
+                Location = "Yambol",
+                IsDeleted = false
+            };
+            GymClass mockGymClass = new GymClass
+            {
+                Class = mockClass,
+                Gym = mockGym,
+                IsDeleted = false
+            };
+            AddClassToGymInputModel mockInputModel = new AddClassToGymInputModel
+            {
+                Id = classId.ToString(),
+                Title = "Full-Body Strength Training",
+                Gyms = new[]
+                {
+                    new GymCheckBoxItemInputModel
+                    {
+                        Id = gymId.ToString(),
+                        Name = "Gladiator",
+                        Location = "Yambol",
+                        IsSelected = true
+                    }
+                }
+            };
+
+            ICollection<GymClass> mockList = new List<GymClass>(){mockGymClass};
+
+            classRepository.Setup(r => r.GetByIdAsync(classId)).ReturnsAsync(mockClass);
+            gymRepository.Setup(r => r.GetByIdAsync(gymId)).ReturnsAsync(mockGym);
+            gymClassRepository.Setup(r => r.FirstOrDefaultAsync(gc => gc.ClassId == classId && gc.GymId == gymId))
+                .ReturnsAsync(mockGymClass);
+
+            bool result = await classService.AddClassToGymsAsync(classId, mockInputModel);
+
+            Assert.IsTrue(result);
+        }
+
+        [Test]
+        public async Task AddClassToGymsNotSelectedNoGymClassPositive()
+        {
+            IClassService classService = new ClassService(classRepository.Object, gymRepository.Object, gymClassRepository.Object);
+
+            Guid classId = Guid.Parse("07A8335B-49FD-4C8B-A802-F8A783F1E7CE");
+            Guid gymId = Guid.Parse("DA07CD2D-59B2-4572-A1EF-19BBBFDF4984");
+
+            Class mockClass = new Class
+            {
+                Id = classId,
+                Title = "Full-Body Strength Training",
+                StartingDate = new DateTime(2024, 12, 13, 11, 00, 00),
+                Duration = 70,
+                Description = "A well-rounded workout targeting all major muscle groups.",
+                ImageUrl = "https://i0.wp.com/post.healthline.com/wp-content/uploads/2022/04/male-lifting-weight-1296x728-header.jpg?w=1155&h=1528"
+            };
+            Gym mockGym = new Gym
+            {
+                Id = gymId,
+                Name = "Gladiator",
+                Location = "Yambol",
+                IsDeleted = false
+            };
+            GymClass mockGymClass = new GymClass
+            {
+                ClassId = classId,
+                GymId = gymId,
+                Class = mockClass,
+                Gym = mockGym,
+                IsDeleted = false
+            };
+            AddClassToGymInputModel mockInputModel = new AddClassToGymInputModel
+            {
+                Id = classId.ToString(),
+                Title = "Full-Body Strength Training",
+                Gyms = new[]
+                {
+                    new GymCheckBoxItemInputModel
+                    {
+                        Id = gymId.ToString(),
+                        Name = "Gladiator",
+                        Location = "Yambol",
+                        IsSelected = false
+                    }
+                }
+            };
+
+            classRepository.Setup(r => r.GetByIdAsync(classId)).ReturnsAsync(mockClass);
+            gymRepository.Setup(r => r.GetByIdAsync(gymId)).ReturnsAsync(mockGym);
+            gymClassRepository.Setup(r => r.FirstOrDefaultAsync(gc => gc.ClassId == classId &&
+                                                                      gc.GymId == gymId)).ReturnsAsync(mockGymClass);
+
+
+            bool result = await classService.AddClassToGymsAsync(classId, mockInputModel);
+        }
+
+        [Test]
+        public async Task AddClassToGymsNullClassNegative()
+        {
+            IClassService classService = new ClassService(classRepository.Object, gymRepository.Object, gymClassRepository.Object);
+
+            bool result = await classService.AddClassToGymsAsync(Guid.Empty, new AddClassToGymInputModel());
+
+            Assert.False(result);
+        }
+
+        [Test]
+        public async Task AddClassToGymsGymGuidNotValidNegative()
+        {
+            IClassService classService = new ClassService(classRepository.Object, gymRepository.Object, gymClassRepository.Object);
+
+            Guid classId = Guid.Parse("07A8335B-49FD-4C8B-A802-F8A783F1E7CE");
+            string gymId = "0000";
+
+            Class mockClass = new Class
+            {
+                Id = classId,
+                Title = "Full-Body Strength Training",
+                StartingDate = new DateTime(2024, 12, 13, 11, 00, 00),
+                Duration = 70,
+                Description = "A well-rounded workout targeting all major muscle groups.",
+                ImageUrl = "https://i0.wp.com/post.healthline.com/wp-content/uploads/2022/04/male-lifting-weight-1296x728-header.jpg?w=1155&h=1528"
+            };
+            AddClassToGymInputModel mockInputModel = new AddClassToGymInputModel
+            {
+                Id = classId.ToString(),
+                Title = "Full-Body Strength Training",
+                Gyms = new[]
+                {
+                    new GymCheckBoxItemInputModel
+                    {
+                        Id = gymId.ToString(),
+                        Name = "Gladiator",
+                        Location = "Yambol",
+                        IsSelected = false
+                    }
+                }
+            };
+
+            classRepository.Setup(r => r.GetByIdAsync(classId)).ReturnsAsync(mockClass);
+
+            bool result = await classService.AddClassToGymsAsync(classId, mockInputModel);
+
+            Assert.False(result);
+        }
+
+        [Test]
+        public async Task AddClassToGymsGymNotFoundNegative()
+        {
+            IClassService classService = new ClassService(classRepository.Object, gymRepository.Object, gymClassRepository.Object);
+
+            Guid classId = Guid.Parse("07A8335B-49FD-4C8B-A802-F8A783F1E7CE");
+            Guid gymId = Guid.Parse("DA07CD2D-59B2-4572-A1EF-19BBBFDF4984");
+
+            Class mockClass = new Class
+            {
+                Id = classId,
+                Title = "Full-Body Strength Training",
+                StartingDate = new DateTime(2024, 12, 13, 11, 00, 00),
+                Duration = 70,
+                Description = "A well-rounded workout targeting all major muscle groups.",
+                ImageUrl = "https://i0.wp.com/post.healthline.com/wp-content/uploads/2022/04/male-lifting-weight-1296x728-header.jpg?w=1155&h=1528"
+            };
+            Gym mockGym = null;
+
+            GymClass mockGymClass = new GymClass
+            {
+                ClassId = classId,
+                GymId = gymId,
+                Class = mockClass,
+                Gym = mockGym,
+                IsDeleted = false
+            };
+            AddClassToGymInputModel mockInputModel = new AddClassToGymInputModel
+            {
+                Id = classId.ToString(),
+                Title = "Full-Body Strength Training",
+                Gyms = new[]
+                {
+                    new GymCheckBoxItemInputModel
+                    {
+                        Id = gymId.ToString(),
+                        Name = "Gladiator",
+                        Location = "Yambol",
+                        IsSelected = false
+                    }
+                }
+            };
+            classRepository.Setup(r => r.GetByIdAsync(classId)).ReturnsAsync(mockClass);
+            gymRepository.Setup(r => r.GetByIdAsync(gymId)).ReturnsAsync(mockGym);
+
+            bool result = await classService.AddClassToGymsAsync(classId, mockInputModel);
+
+            Assert.False(result);    
+        }
+
+        [Test]
+        public async Task AddClassToGymsGymDeletedNegative()
+        {
+            IClassService classService = new ClassService(classRepository.Object, gymRepository.Object, gymClassRepository.Object);
+
+            Guid classId = Guid.Parse("07A8335B-49FD-4C8B-A802-F8A783F1E7CE");
+            Guid gymId = Guid.Parse("DA07CD2D-59B2-4572-A1EF-19BBBFDF4984");
+
+            Class mockClass = new Class
+            {
+                Id = classId,
+                Title = "Full-Body Strength Training",
+                StartingDate = new DateTime(2024, 12, 13, 11, 00, 00),
+                Duration = 70,
+                Description = "A well-rounded workout targeting all major muscle groups.",
+                ImageUrl = "https://i0.wp.com/post.healthline.com/wp-content/uploads/2022/04/male-lifting-weight-1296x728-header.jpg?w=1155&h=1528"
+            };
+            Gym mockGym = new Gym
+            {
+                Id = gymId,
+                Name = "Gladiator",
+                Location = "Yambol",
+                IsDeleted = true
+            };
+            GymClass mockGymClass = new GymClass
+            {
+                ClassId = classId,
+                GymId = gymId,
+                Class = mockClass,
+                Gym = mockGym,
+                IsDeleted = false
+            };
+            AddClassToGymInputModel mockInputModel = new AddClassToGymInputModel
+            {
+                Id = classId.ToString(),
+                Title = "Full-Body Strength Training",
+                Gyms = new[]
+                {
+                    new GymCheckBoxItemInputModel
+                    {
+                        Id = gymId.ToString(),
+                        Name = "Gladiator",
+                        Location = "Yambol",
+                        IsSelected = false
+                    }
+                }
+            };
+            classRepository.Setup(r => r.GetByIdAsync(classId)).ReturnsAsync(mockClass);
+            gymRepository.Setup(r => r.GetByIdAsync(gymId)).ReturnsAsync(mockGym);
+
+            bool result = await classService.AddClassToGymsAsync(classId, mockInputModel);
+
+            Assert.False(result);
         }
     }
 }
