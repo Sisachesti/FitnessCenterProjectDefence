@@ -361,3 +361,5 @@ MigrationBackup/
 
 # Fody - auto-generated XML schema
 FodyWeavers.xsd
+/FitnessCenter/wwwroot/lib/jquery/dist/jquery.js
+/FitnessCenter/wwwroot/lib/jquery-validation/dist/jquery.validate.js

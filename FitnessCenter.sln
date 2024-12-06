@@ -27,7 +27,11 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "FitnessCenter.Web.ViewModel
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "FitnessCenter.Web.Infrastructure", "FitnessCenter.Infrastructure\FitnessCenter.Web.Infrastructure.csproj", "{AEECD91E-AD05-4EC7-83C7-4831B5AD2D26}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FitnessCenter.WebApi", "FitnessCenter.WebApi\FitnessCenter.WebApi.csproj", "{A0C09396-1D0D-48A9-99A3-C8F3E52A47F1}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "FitnessCenter.WebApi", "FitnessCenter.WebApi\FitnessCenter.WebApi.csproj", "{A0C09396-1D0D-48A9-99A3-C8F3E52A47F1}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Tests", "Tests", "{CD78430B-5639-4C3B-9108-8F1353D49FC8}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FitnessCenter.Services.Tests", "ClassServiceTests\FitnessCenter.Services.Tests.csproj", "{3E6B8A14-95DC-41A8-9006-5020583B8346}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -71,6 +75,10 @@ Global
 		{A0C09396-1D0D-48A9-99A3-C8F3E52A47F1}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{A0C09396-1D0D-48A9-99A3-C8F3E52A47F1}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{A0C09396-1D0D-48A9-99A3-C8F3E52A47F1}.Release|Any CPU.Build.0 = Release|Any CPU
+		{3E6B8A14-95DC-41A8-9006-5020583B8346}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{3E6B8A14-95DC-41A8-9006-5020583B8346}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{3E6B8A14-95DC-41A8-9006-5020583B8346}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{3E6B8A14-95DC-41A8-9006-5020583B8346}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -85,6 +93,7 @@ Global
 		{23589632-88DF-4561-9DAC-49F81518B3D7} = {0A008B49-4C78-471F-97A4-9A76FC4ECCAF}
 		{AEECD91E-AD05-4EC7-83C7-4831B5AD2D26} = {0A008B49-4C78-471F-97A4-9A76FC4ECCAF}
 		{A0C09396-1D0D-48A9-99A3-C8F3E52A47F1} = {0A008B49-4C78-471F-97A4-9A76FC4ECCAF}
+		{3E6B8A14-95DC-41A8-9006-5020583B8346} = {CD78430B-5639-4C3B-9108-8F1353D49FC8}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {8D6D2EB3-3E97-482D-8474-CC3CED8FD4C1}
