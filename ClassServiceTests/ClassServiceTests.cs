@@ -13,6 +13,7 @@ namespace FitnessCenter.Services.Tests
     using MockQueryable;
     using Moq;
     using static Common.EntityValidationConstants.Class;
+    using static Common.ApplicationConstants;
 
     [TestFixture]
     public class Tests
@@ -729,6 +730,86 @@ namespace FitnessCenter.Services.Tests
             bool result = await classService.AddClassToGymsAsync(classId, mockInputModel);
 
             Assert.False(result);
+        }
+
+        [Test]
+        public async Task EditClassClassGuidNotValidNegative()
+        {
+            IClassService classService = new ClassService(classRepository.Object, gymRepository.Object, gymClassRepository.Object);
+
+            string classGuid = "0000";
+
+            EditClassFormModel formModel = new EditClassFormModel()
+            {
+                Id = classGuid,
+            };
+
+            bool result = await classService.EditClassAsync(formModel);
+
+            Assert.False(result);
+        }
+
+        [Test]
+        public async Task EditClassClassStartingDateNotValidNegative()
+        {
+            IClassService classService = new ClassService(classRepository.Object, gymRepository.Object, gymClassRepository.Object);
+
+            Guid classGuid = Guid.Parse("95766741-DE9A-4380-9D0A-3E2B22099004");
+
+            var formModel = new EditClassFormModel()
+            {
+                Id = classGuid.ToString(),
+                Title = "Yoga Class",
+                StartingDate = new DateTime().ToString(),
+                Duration = 90,
+                Description =
+                    "Perfect for beginners or those seeking a calming, slower-paced practice. This class focuses on foundational poses, gentle stretches, and breathwork to enhance flexibility and relaxation. No prior experience needed.",
+                ImageUrl = "https://www.everydayyoga.com/cdn/shop/articles/yoga_1024x1024.jpg?v=1703853908"
+            };
+
+            bool result = await classService.EditClassAsync(formModel);
+
+            Assert.False(result);
+        }
+
+        [Test]
+        public async Task EditClassClassImageNullPositive()
+        {
+            IClassService classService = new ClassService(classRepository.Object, gymRepository.Object, gymClassRepository.Object);
+
+            Guid classGuid = Guid.Parse("95766741-DE9A-4380-9D0A-3E2B22099004");
+
+            var formModel = new EditClassFormModel
+            {
+                Id = classGuid.ToString(),
+                Title = "Yoga Class",
+                StartingDate = new DateTime(2024, 12, 13, 11, 00, 00).ToString(StartingDateFormat, CultureInfo.InvariantCulture),
+                Duration = 90,
+                Description = "Perfect for beginners or those seeking a calming, slower-paced practice. This class focuses on foundational poses, gentle stretches, and breathwork to enhance flexibility and relaxation. No prior experience needed.",
+                ImageUrl = "No image"
+            };
+            Class editedClass = new Class()
+            {
+                Id = classGuid,
+                Title = "Yoga Class",
+                StartingDate = new DateTime(2024, 12, 13, 11, 00, 00),
+                Duration = 90,
+                Description = "Perfect for beginners or those seeking a calming, slower-paced practice. This class focuses on foundational poses, gentle stretches, and breathwork to enhance flexibility and relaxation. No prior experience needed.",
+                ImageUrl = NoImageUrl
+            };
+
+            classRepository.Setup(r => r.UpdateAsync(It.IsAny<Class>()))
+                .Returns(Task.FromResult(true))
+                .Callback<Class>(updatedClass =>
+                {
+                    // Verify that the updated class has the correct ImageUrl
+                    Assert.AreEqual(NoImageUrl, updatedClass.ImageUrl);
+                });
+
+            bool result = await classService.EditClassAsync(formModel);
+
+            Assert.True(result);
+            classRepository.Verify(r => r.UpdateAsync(It.Is<Class>(c => c.ImageUrl == NoImageUrl)), Times.Once);
         }
     }
 }
