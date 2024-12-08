@@ -1,4 +1,7 @@
 using System.Globalization;
+using System.Linq.Expressions;
+using AutoMapper;
+using FitnessCenter.Common;
 using FitnessCenter.Web.ViewModels.Gym;
 
 namespace FitnessCenter.Services.Tests
@@ -18,6 +21,7 @@ namespace FitnessCenter.Services.Tests
     [TestFixture]
     public class Tests
     {
+
         private IList<Class> classesData = new List<Class>()
         {
                 new Class()
@@ -47,15 +51,6 @@ namespace FitnessCenter.Services.Tests
                     Description = "A basketball training program is a specialized practice designed to improve an individual's skillset. It typically involves drills and exercises focused on developing specific areas, such as ball handling, shooting, passing, and agility.",
                     ImageUrl = "https://revolutionbasketballtraining.com/wp-content/uploads/2024/06/Personal-Basketball-Training-Can-Elevate-Your-Game-1.png"
                 }
-        };
-
-        private IList<Gym> gymsData = new List<Gym>()
-        {
-            new Gym()
-            {
-                Name = "Gladiator",
-                Location = "Yambol"
-            }
         };
 
         private Mock<IRepository<Class, Guid>> classRepository;
@@ -463,65 +458,7 @@ namespace FitnessCenter.Services.Tests
         }
 
         [Test]
-        public async Task AddClassToGymsSelectedNoGymClassPositive()
-        {
-            IClassService classService = new ClassService(classRepository.Object, gymRepository.Object, gymClassRepository.Object);
-
-            Guid classId = Guid.Parse("07A8335B-49FD-4C8B-A802-F8A783F1E7CE");
-            Guid gymId = Guid.Parse("DA07CD2D-59B2-4572-A1EF-19BBBFDF4984");
-
-            Class mockClass = new Class
-            {
-                Id = classId,
-                Title = "Full-Body Strength Training",
-                StartingDate = new DateTime(2024, 12, 13, 11, 00, 00),
-                Duration = 70,
-                Description = "A well-rounded workout targeting all major muscle groups.",
-                ImageUrl = "https://i0.wp.com/post.healthline.com/wp-content/uploads/2022/04/male-lifting-weight-1296x728-header.jpg?w=1155&h=1528"
-            };
-            Gym mockGym = new Gym
-            {
-                Id = gymId,
-                Name = "Gladiator",
-                Location = "Yambol",
-                IsDeleted = false
-            };
-            GymClass mockGymClass = new GymClass
-            {
-                Class = mockClass,
-                Gym = mockGym,
-                IsDeleted = false
-            };
-            AddClassToGymInputModel mockInputModel = new AddClassToGymInputModel
-            {
-                Id = classId.ToString(),
-                Title = "Full-Body Strength Training",
-                Gyms = new[]
-                {
-                    new GymCheckBoxItemInputModel
-                    {
-                        Id = gymId.ToString(),
-                        Name = "Gladiator",
-                        Location = "Yambol",
-                        IsSelected = true
-                    }
-                }
-            };
-
-            ICollection<GymClass> mockList = new List<GymClass>(){mockGymClass};
-
-            classRepository.Setup(r => r.GetByIdAsync(classId)).ReturnsAsync(mockClass);
-            gymRepository.Setup(r => r.GetByIdAsync(gymId)).ReturnsAsync(mockGym);
-            gymClassRepository.Setup(r => r.FirstOrDefaultAsync(gc => gc.ClassId == classId && gc.GymId == gymId))
-                .ReturnsAsync(mockGymClass);
-
-            bool result = await classService.AddClassToGymsAsync(classId, mockInputModel);
-
-            Assert.IsTrue(result);
-        }
-
-        [Test]
-        public async Task AddClassToGymsNotSelectedNoGymClassPositive()
+        public async Task AddClassToGyms_SelectedFoundGymClassPositive()
         {
             IClassService classService = new ClassService(classRepository.Object, gymRepository.Object, gymClassRepository.Object);
 
@@ -547,11 +484,206 @@ namespace FitnessCenter.Services.Tests
             GymClass mockGymClass = new GymClass
             {
                 ClassId = classId,
-                GymId = gymId,
                 Class = mockClass,
+                GymId = gymId,
                 Gym = mockGym,
+                IsDeleted = true
+            };
+            AddClassToGymInputModel mockInputModel = new AddClassToGymInputModel
+            {
+                Id = classId.ToString(),
+                Title = "Full-Body Strength Training",
+                Gyms = new[]
+                {
+                    new GymCheckBoxItemInputModel
+                    {
+                        Id = gymId.ToString(),
+                        Name = "Gladiator",
+                        Location = "Yambol",
+                        IsSelected = true
+                    }
+                }
+            };
+
+            ICollection<GymClass> mockList = new List<GymClass>(){mockGymClass};
+
+            classRepository.Setup(r => r.GetByIdAsync(classId)).ReturnsAsync(mockClass);
+            gymRepository.Setup(r => r.GetByIdAsync(gymId)).ReturnsAsync(mockGym);
+            gymClassRepository.Setup(repo => repo.FirstOrDefaultAsync(It.IsAny<Expression<Func<GymClass, bool>>>()))
+                .ReturnsAsync(mockGymClass);
+            await gymClassRepository.Object.AddRangeAsync(mockList.ToArray());
+
+            var gymClass = await gymClassRepository.Object.FirstOrDefaultAsync(gc => gc.ClassId == classId && gc.GymId == gymId);
+
+            bool result = await classService.AddClassToGymsAsync(classId, mockInputModel);
+
+            Assert.IsTrue(result);
+            Assert.IsNotNull(gymClass);
+            Assert.IsFalse(gymClass.IsDeleted);
+            gymClassRepository.Verify(repo => repo.AddRangeAsync(It.Is<GymClass[]>(entities => entities.Length == 0)), Times.Once);
+        }
+
+        [Test]
+        public async Task AddClassToGyms_SelectedNotFoundGymClassPositive()
+        {
+            IClassService classService = new ClassService(classRepository.Object, gymRepository.Object, gymClassRepository.Object);
+
+            Guid classId = Guid.Parse("07A8335B-49FD-4C8B-A802-F8A783F1E7CE");
+            Guid gymId = Guid.Parse("DA07CD2D-59B2-4572-A1EF-19BBBFDF4984");
+
+            Class mockClass = new Class
+            {
+                Id = classId,
+                Title = "Full-Body Strength Training",
+                StartingDate = new DateTime(2024, 12, 13, 11, 00, 00),
+                Duration = 70,
+                Description = "A well-rounded workout targeting all major muscle groups.",
+                ImageUrl = "https://i0.wp.com/post.healthline.com/wp-content/uploads/2022/04/male-lifting-weight-1296x728-header.jpg?w=1155&h=1528"
+            };
+            Gym mockGym = new Gym
+            {
+                Id = gymId,
+                Name = "Gladiator",
+                Location = "Yambol",
                 IsDeleted = false
             };
+            GymClass mockGymClass = null;
+            AddClassToGymInputModel mockInputModel = new AddClassToGymInputModel
+            {
+                Id = classId.ToString(),
+                Title = "Full-Body Strength Training",
+                Gyms = new[]
+                {
+                    new GymCheckBoxItemInputModel
+                    {
+                        Id = gymId.ToString(),
+                        Name = "Gladiator",
+                        Location = "Yambol",
+                        IsSelected = true
+                    }
+                }
+            };
+
+            var mockList = new List<GymClass>();
+
+            classRepository.Setup(r => r.GetByIdAsync(classId)).ReturnsAsync(mockClass);
+            gymRepository.Setup(r => r.GetByIdAsync(gymId)).ReturnsAsync(mockGym);
+            gymClassRepository.Setup(repo => repo.FirstOrDefaultAsync(It.IsAny<Expression<Func<GymClass, bool>>>()))
+                .ReturnsAsync(mockGymClass);
+            await gymClassRepository.Object.AddRangeAsync(mockList.ToArray());
+
+            mockList.Add(new GymClass
+            {
+                Gym = mockGym,
+                Class = mockClass
+            });
+
+            bool result = await classService.AddClassToGymsAsync(classId, mockInputModel);
+
+
+            Assert.True(result);
+            gymClassRepository.Verify(r => r.AddRangeAsync(It.Is<GymClass[]>(entities =>
+                entities.Length == mockList.ToArray().Count() &&
+                entities[0].ClassId == mockList.ToArray()[0].ClassId &&
+                entities[0].GymId == mockList.ToArray()[0].GymId)), Times.Once);
+            Assert.That(1 ,Is.EqualTo(mockList.Count));
+
+            var addedEntity = mockList[0];
+            Assert.NotNull(addedEntity);
+            Assert.AreEqual(mockGym, addedEntity.Gym);
+            Assert.AreEqual(mockClass, addedEntity.Class);
+        }
+
+        [Test]
+        public async Task AddClassToGyms_NotSelectedFoundGymClassPositive()
+        {
+            IClassService classService = new ClassService(classRepository.Object, gymRepository.Object, gymClassRepository.Object);
+
+            Guid classId = Guid.Parse("07A8335B-49FD-4C8B-A802-F8A783F1E7CE");
+            Guid gymId = Guid.Parse("DA07CD2D-59B2-4572-A1EF-19BBBFDF4984");
+
+            Class mockClass = new Class
+            {
+                Id = classId,
+                Title = "Full-Body Strength Training",
+                StartingDate = new DateTime(2024, 12, 13, 11, 00, 00),
+                Duration = 70,
+                Description = "A well-rounded workout targeting all major muscle groups.",
+                ImageUrl = "https://i0.wp.com/post.healthline.com/wp-content/uploads/2022/04/male-lifting-weight-1296x728-header.jpg?w=1155&h=1528"
+            };
+            Gym mockGym = new Gym
+            {
+                Id = gymId,
+                Name = "Gladiator",
+                Location = "Yambol",
+                IsDeleted = false
+            };
+            GymClass mockGymClass = new GymClass
+            {
+                ClassId = classId,
+                Class = mockClass,
+                GymId = gymId,
+                Gym = mockGym,
+                IsDeleted = true
+            };
+            AddClassToGymInputModel mockInputModel = new AddClassToGymInputModel
+            {
+                Id = classId.ToString(),
+                Title = "Full-Body Strength Training",
+                Gyms = new[]
+                {
+                    new GymCheckBoxItemInputModel
+                    {
+                        Id = gymId.ToString(),
+                        Name = "Gladiator",
+                        Location = "Yambol",
+                        IsSelected = false
+                    }
+                }
+            };
+            ICollection<GymClass> mockList = new List<GymClass>() { mockGymClass };
+
+            classRepository.Setup(r => r.GetByIdAsync(classId)).ReturnsAsync(mockClass);
+            gymRepository.Setup(r => r.GetByIdAsync(gymId)).ReturnsAsync(mockGym);
+            gymClassRepository.Setup(r => r.FirstOrDefaultAsync(It.IsAny<Expression<Func<GymClass, bool>>>()))
+                .ReturnsAsync(mockGymClass);
+
+            await gymClassRepository.Object.AddRangeAsync(mockList.ToArray());
+
+            var gymClass = await gymClassRepository.Object.FirstOrDefaultAsync(gc => gc.ClassId == classId && gc.GymId == gymId);
+
+            bool result = await classService.AddClassToGymsAsync(classId, mockInputModel);
+
+            Assert.IsTrue(result);
+            Assert.IsNotNull(gymClass);
+            gymClassRepository.Verify(r => r.AddRangeAsync(It.Is<GymClass[]>(entities => entities.Length == 0)), Times.Once);
+        }
+
+        [Test]
+        public async Task AddClassToGyms_NotSelectedNoGymClassPositive()
+        {
+            IClassService classService = new ClassService(classRepository.Object, gymRepository.Object, gymClassRepository.Object);
+
+            Guid classId = Guid.Parse("07A8335B-49FD-4C8B-A802-F8A783F1E7CE");
+            Guid gymId = Guid.Parse("DA07CD2D-59B2-4572-A1EF-19BBBFDF4984");
+
+            Class mockClass = new Class
+            {
+                Id = classId,
+                Title = "Full-Body Strength Training",
+                StartingDate = new DateTime(2024, 12, 13, 11, 00, 00),
+                Duration = 70,
+                Description = "A well-rounded workout targeting all major muscle groups.",
+                ImageUrl = "https://i0.wp.com/post.healthline.com/wp-content/uploads/2022/04/male-lifting-weight-1296x728-header.jpg?w=1155&h=1528"
+            };
+            Gym mockGym = new Gym
+            {
+                Id = gymId,
+                Name = "Gladiator",
+                Location = "Yambol",
+                IsDeleted = false
+            };
+            GymClass mockGymClass = null;
             AddClassToGymInputModel mockInputModel = new AddClassToGymInputModel
             {
                 Id = classId.ToString(),
@@ -570,25 +702,40 @@ namespace FitnessCenter.Services.Tests
 
             classRepository.Setup(r => r.GetByIdAsync(classId)).ReturnsAsync(mockClass);
             gymRepository.Setup(r => r.GetByIdAsync(gymId)).ReturnsAsync(mockGym);
-            gymClassRepository.Setup(r => r.FirstOrDefaultAsync(gc => gc.ClassId == classId &&
-                                                                      gc.GymId == gymId)).ReturnsAsync(mockGymClass);
+            gymClassRepository.Setup(repo => repo.FirstOrDefaultAsync(It.IsAny<Expression<Func<GymClass, bool>>>()))
+                .ReturnsAsync(mockGymClass);
 
+            var gymClass = await gymClassRepository.Object.FirstOrDefaultAsync(gc => gc.ClassId == classId && gc.GymId == gymId);
 
             bool result = await classService.AddClassToGymsAsync(classId, mockInputModel);
+
+            Assert.IsNull(gymClass);
+            Assert.True(result);
+            gymClassRepository.Verify(r => r.AddRangeAsync(It.Is<GymClass[]>(entities => entities.Length == 0)), Times.Once);
         }
 
         [Test]
-        public async Task AddClassToGymsNullClassNegative()
+        public async Task AddClassToGyms_NullClassNegative()
         {
             IClassService classService = new ClassService(classRepository.Object, gymRepository.Object, gymClassRepository.Object);
 
-            bool result = await classService.AddClassToGymsAsync(Guid.Empty, new AddClassToGymInputModel());
+            Guid classId = Guid.Parse("07A8335B-49FD-4C8B-A802-F8A783F1E7CE");
+
+            AddClassToGymInputModel inputModel = null;
+            Class mockClass = null;
+
+            classRepository.Setup(r => r.GetByIdAsync(classId)).ReturnsAsync(mockClass);
+
+            var classResult = await classRepository.Object.GetByIdAsync(classId);
+
+            bool result = await classService.AddClassToGymsAsync(classId, inputModel);
 
             Assert.False(result);
+            Assert.IsNull(classResult);
         }
 
         [Test]
-        public async Task AddClassToGymsGymGuidNotValidNegative()
+        public async Task AddClassToGyms_GymGuidNotValidNegative()
         {
             IClassService classService = new ClassService(classRepository.Object, gymRepository.Object, gymClassRepository.Object);
 
@@ -622,13 +769,18 @@ namespace FitnessCenter.Services.Tests
 
             classRepository.Setup(r => r.GetByIdAsync(classId)).ReturnsAsync(mockClass);
 
+            Guid outputGuid = Guid.Empty;
+
+            bool validGuid = Guid.TryParse(gymId, out outputGuid);
+
             bool result = await classService.AddClassToGymsAsync(classId, mockInputModel);
 
             Assert.False(result);
+            Assert.False(validGuid);
         }
 
         [Test]
-        public async Task AddClassToGymsGymNotFoundNegative()
+        public async Task AddClassToGyms_GymNotFoundNegative()
         {
             IClassService classService = new ClassService(classRepository.Object, gymRepository.Object, gymClassRepository.Object);
 
@@ -645,7 +797,6 @@ namespace FitnessCenter.Services.Tests
                 ImageUrl = "https://i0.wp.com/post.healthline.com/wp-content/uploads/2022/04/male-lifting-weight-1296x728-header.jpg?w=1155&h=1528"
             };
             Gym mockGym = null;
-
             GymClass mockGymClass = new GymClass
             {
                 ClassId = classId,
@@ -669,16 +820,18 @@ namespace FitnessCenter.Services.Tests
                     }
                 }
             };
+
             classRepository.Setup(r => r.GetByIdAsync(classId)).ReturnsAsync(mockClass);
             gymRepository.Setup(r => r.GetByIdAsync(gymId)).ReturnsAsync(mockGym);
 
             bool result = await classService.AddClassToGymsAsync(classId, mockInputModel);
 
-            Assert.False(result);    
+            Assert.False(result);
+            Assert.IsNull(mockGym);
         }
 
         [Test]
-        public async Task AddClassToGymsGymDeletedNegative()
+        public async Task AddClassToGyms_GymDeletedNegative()
         {
             IClassService classService = new ClassService(classRepository.Object, gymRepository.Object, gymClassRepository.Object);
 
@@ -724,12 +877,14 @@ namespace FitnessCenter.Services.Tests
                     }
                 }
             };
+
             classRepository.Setup(r => r.GetByIdAsync(classId)).ReturnsAsync(mockClass);
             gymRepository.Setup(r => r.GetByIdAsync(gymId)).ReturnsAsync(mockGym);
 
             bool result = await classService.AddClassToGymsAsync(classId, mockInputModel);
 
             Assert.False(result);
+            Assert.True(mockGym.IsDeleted);
         }
 
         [Test]
@@ -811,5 +966,6 @@ namespace FitnessCenter.Services.Tests
             Assert.True(result);
             classRepository.Verify(r => r.UpdateAsync(It.Is<Class>(c => c.ImageUrl == NoImageUrl)), Times.Once);
         }
+
     }
 }
