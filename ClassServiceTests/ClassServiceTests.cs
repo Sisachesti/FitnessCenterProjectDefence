@@ -4,6 +4,7 @@ using System.Linq.Expressions;
 
 namespace FitnessCenter.Services.Tests
 {
+    using AutoMapper;
     using FitnessCenter.Data.Models;
     using FitnessCenter.Data.Repository.Interfaces;
     using FitnessCenter.Models;
@@ -24,38 +25,39 @@ namespace FitnessCenter.Services.Tests
 
         private IList<Class> classesData = new List<Class>()
         {
-                new Class()
-                {
-                    Id = Guid.Parse("95766741-DE9A-4380-9D0A-3E2B22099004"),
-                    Title = "Yoga Class",
-                    StartingDate = new DateTime(2024, 12, 16, 12, 00, 00),
-                    Duration = 90,
-                    Description = "Perfect for beginners or those seeking a calming, slower-paced practice. This class focuses on foundational poses, gentle stretches, and breathwork to enhance flexibility and relaxation. No prior experience needed.",
-                    ImageUrl = "https://www.everydayyoga.com/cdn/shop/articles/yoga_1024x1024.jpg?v=1703853908"
-                },
-                new Class()
-                {
-                    Id = Guid.Parse("07A8335B-49FD-4C8B-A802-F8A783F1E7CE"),
-                    Title = "Full-Body Strength Training",
-                    StartingDate = new DateTime(2024, 12, 13, 11, 00, 00),
-                    Duration = 70,
-                    Description = "A well-rounded workout targeting all major muscle groups. Incorporates free weights, resistance machines, and bodyweight exercises to improve overall strength, endurance, and stability. Suitable for all levels, with modifications available.",
-                    ImageUrl = "https://i0.wp.com/post.healthline.com/wp-content/uploads/2022/04/male-lifting-weight-1296x728-header.jpg?w=1155&h=1528"
-                },
-                new Class()
-                {
-                    Id = Guid.Parse("7206E644-4A54-4A55-B1D9-3A9C6F814D5C"),
-                    Title = "Basketball Training",
-                    StartingDate = new DateTime(2024, 12, 13, 16, 00, 00),
-                    Duration = 120,
-                    Description = "A basketball training program is a specialized practice designed to improve an individual's skillset. It typically involves drills and exercises focused on developing specific areas, such as ball handling, shooting, passing, and agility.",
-                    ImageUrl = "https://revolutionbasketballtraining.com/wp-content/uploads/2024/06/Personal-Basketball-Training-Can-Elevate-Your-Game-1.png"
-                }
+            new Class()
+            {
+                Id = Guid.Parse("95766741-DE9A-4380-9D0A-3E2B22099004"),
+                Title = "Yoga Class",
+                StartingDate = new DateTime(2024, 12, 16, 12, 00, 00),
+                Duration = 90,
+                Description = "Perfect for beginners or those seeking a calming, slower-paced practice. This class focuses on foundational poses, gentle stretches, and breathwork to enhance flexibility and relaxation. No prior experience needed.",
+                ImageUrl = "https://www.everydayyoga.com/cdn/shop/articles/yoga_1024x1024.jpg?v=1703853908"
+            },
+            new Class()
+            {
+                Id = Guid.Parse("07A8335B-49FD-4C8B-A802-F8A783F1E7CE"),
+                Title = "Full-Body Strength Training",
+                StartingDate = new DateTime(2024, 12, 13, 11, 00, 00),
+                Duration = 70,
+                Description = "A well-rounded workout targeting all major muscle groups. Incorporates free weights, resistance machines, and bodyweight exercises to improve overall strength, endurance, and stability. Suitable for all levels, with modifications available.",
+                ImageUrl = "https://i0.wp.com/post.healthline.com/wp-content/uploads/2022/04/male-lifting-weight-1296x728-header.jpg?w=1155&h=1528"
+            },
+            new Class()
+            {
+                Id = Guid.Parse("7206E644-4A54-4A55-B1D9-3A9C6F814D5C"),
+                Title = "Basketball Training",
+                StartingDate = new DateTime(2024, 12, 13, 16, 00, 00),
+                Duration = 120,
+                Description = "A basketball training program is a specialized practice designed to improve an individual's skillset. It typically involves drills and exercises focused on developing specific areas, such as ball handling, shooting, passing, and agility.",
+                ImageUrl = "https://revolutionbasketballtraining.com/wp-content/uploads/2024/06/Personal-Basketball-Training-Can-Elevate-Your-Game-1.png"
+            }
         };
 
         private Mock<IRepository<Class, Guid>> classRepository;
         private Mock<IRepository<Gym, Guid>> gymRepository;
         private Mock<IRepository<GymClass, object>> gymClassRepository;
+        private IClassService classService;
 
         [OneTimeSetUp]
         public void OneTimeSetup()
@@ -69,6 +71,7 @@ namespace FitnessCenter.Services.Tests
             this.classRepository = new Mock<IRepository<Class, Guid>>();
             this.gymRepository = new Mock<IRepository<Gym, Guid>>();
             this.gymClassRepository = new Mock<IRepository<GymClass, object>>();
+            this.classService = new ClassService(classRepository.Object, gymRepository.Object, gymClassRepository.Object);
         }
 
         [Test]
@@ -1141,7 +1144,6 @@ namespace FitnessCenter.Services.Tests
             var gymClassRepository = new Mock<IRepository<GymClass, object>>();
 
             // Pass null repository into the service
-            IClassService classService = new ClassService(nullClassRepository?.Object, gymRepository.Object, gymClassRepository.Object);
 
             Guid classId = Guid.NewGuid(); // Test Guid
 
@@ -1173,6 +1175,185 @@ namespace FitnessCenter.Services.Tests
             int count = await classService.GetClassesCountByFilterAsync(viewModel);
 
             Assert.AreEqual(allClassesActual.Count(), count);
+        }
+
+        [Test]
+        public async Task GetEditClassFormModelByIdPositive()
+        {
+            var mockClassRepository = new Mock<IRepository<Class, Guid>>();
+
+            var classId = Guid.NewGuid();
+            var classData = new List<Class>
+            {
+                new Class
+                {
+                    Id = classId,
+                    Title = "Test Class",
+                    Duration = 90,
+                    Description = "Test Description",
+                    ImageUrl = "test-image-url.jpg",
+                    IsDeleted = false
+                },
+                new Class
+                {
+                    Id = Guid.NewGuid(),
+                    Title = "Deleted Class",
+                    Duration = 180,
+                    Description = "Deleted Description",
+                    ImageUrl = "deleted-image-url.jpg",
+                    IsDeleted = true
+                }
+            }.AsQueryable();
+
+            var asyncClassData = classData.BuildMock();
+            mockClassRepository.Setup(repo => repo.GetAllAttached()).Returns(asyncClassData);
+
+            var mockEditClassFormModel = new EditClassFormModel
+            {
+                Id = classId.ToString(),
+                Title = "Test Class",
+                Duration = 90,
+                Description = "Test Description",
+                ImageUrl = "test-image-url.jpg"
+            };
+
+            AutoMapperConfig.MapperInstance = new MapperConfiguration(cfg =>
+            {
+                cfg.CreateMap<Class, EditClassFormModel>();
+            }).CreateMapper();
+
+            var classService = new ClassService(mockClassRepository.Object, gymRepository.Object, gymClassRepository.Object);
+
+            // Act
+            var result = await classService.GetEditClassFormModelByIdAsync(classId);
+
+            // Assert
+            Assert.NotNull(result);
+            Assert.AreEqual(mockEditClassFormModel.Id, result?.Id);
+            Assert.AreEqual(mockEditClassFormModel.Title, result?.Title);
+            Assert.AreEqual(mockEditClassFormModel.Description, result?.Description);
+            Assert.AreEqual(mockEditClassFormModel.ImageUrl, result?.ImageUrl);
+            mockClassRepository.Verify(repo => repo.GetAllAttached(), Times.Once);
+        }
+
+        [Test]
+        public async Task GetEditClassFormModelByIdNoImagePositive()
+        {
+            var mockClassRepository = new Mock<IRepository<Class, Guid>>();
+
+            string noImageUrl = NoImageUrl;
+
+            var classId = Guid.NewGuid();
+            var classData = new List<Class>
+            {
+                new Class
+                {
+                    Id = classId,
+                    Title = "Test Class",
+                    Duration = 90,
+                    Description = "Test Description",
+                    ImageUrl = noImageUrl,
+                    IsDeleted = false
+                },
+                new Class
+                {
+                    Id = Guid.NewGuid(),
+                    Title = "Deleted Class",
+                    Duration = 180,
+                    Description = "Deleted Description",
+                    ImageUrl = noImageUrl,
+                    IsDeleted = true
+                }
+            }.AsQueryable();
+
+            var asyncClassData = classData.BuildMock();
+            mockClassRepository.Setup(repo => repo.GetAllAttached()).Returns(asyncClassData);
+
+            var mockEditClassFormModel = new EditClassFormModel
+            {
+                Id = classId.ToString(),
+                Title = "Test Class",
+                Duration = 90,
+                Description = "Test Description",
+                ImageUrl = "No image"
+            };
+
+            AutoMapperConfig.MapperInstance = new MapperConfiguration(cfg =>
+            {
+                cfg.CreateMap<Class, EditClassFormModel>();
+            }).CreateMapper();
+
+            var classService = new ClassService(mockClassRepository.Object, gymRepository.Object, gymClassRepository.Object);
+
+            // Act
+            var result = await classService.GetEditClassFormModelByIdAsync(classId);
+
+            // Assert
+            Assert.NotNull(result);
+            Assert.AreEqual(mockEditClassFormModel.Id, result?.Id);
+            Assert.AreEqual(mockEditClassFormModel.Title, result?.Title);
+            Assert.AreEqual(mockEditClassFormModel.Description, result?.Description);
+            Assert.AreEqual(mockEditClassFormModel.ImageUrl, result?.ImageUrl);
+            mockClassRepository.Verify(repo => repo.GetAllAttached(), Times.Once);
+        }
+
+        [Test]
+        public async Task GetClassForDeleteByIdPositive()
+        {
+            var mockClassRepository = new Mock<IRepository<Class, Guid>>();
+
+            var classId = Guid.NewGuid();
+            var classData = new List<Class>
+            {
+                new Class
+                {
+                    Id = classId,
+                    Title = "Test Class",
+                    Duration = 90,
+                    Description = "Test Description",
+                    ImageUrl = "test-image-url.jpg",
+                    IsDeleted = false
+                },
+                new Class
+                {
+                    Id = Guid.NewGuid(),
+                    Title = "Deleted Class",
+                    Duration = 180,
+                    Description = "Deleted Description",
+                    ImageUrl = "deleted-image-url.jpg",
+                    IsDeleted = true
+                }
+            }.AsQueryable();
+
+            var asyncClassData = classData.BuildMock();
+            mockClassRepository.Setup(repo => repo.GetAllAttached()).Returns(asyncClassData);
+
+            var mockEditClassFormModel = new DeleteClassViewModel()
+            {
+                Id = classId.ToString(),
+                Title = "Test Class",
+                Duration = 90,
+                Description = "Test Description",
+                ImageUrl = "test-image-url.jpg"
+            };
+
+            AutoMapperConfig.MapperInstance = new MapperConfiguration(cfg =>
+            {
+                cfg.CreateMap<Class, DeleteClassViewModel>();
+            }).CreateMapper();
+
+            var classService = new ClassService(mockClassRepository.Object, gymRepository.Object, gymClassRepository.Object);
+
+            // Act
+            var result = await classService.GetClassForDeleteByIdAsync(classId);
+
+            // Assert
+            Assert.NotNull(result);
+            Assert.AreEqual(mockEditClassFormModel.Id, result?.Id);
+            Assert.AreEqual(mockEditClassFormModel.Title, result?.Title);
+            Assert.AreEqual(mockEditClassFormModel.Description, result?.Description);
+            Assert.AreEqual(mockEditClassFormModel.ImageUrl, result?.ImageUrl);
+            mockClassRepository.Verify(repo => repo.GetAllAttached(), Times.Once);
         }
     }
 }

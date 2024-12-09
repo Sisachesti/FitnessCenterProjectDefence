@@ -186,7 +186,6 @@
 
         public async Task<EditClassFormModel?> GetEditClassFormModelByIdAsync(Guid id)
         {
-            // TODO: Check soft delete
             EditClassFormModel? editClassFormModel = await this.classRepository
                 .GetAllAttached()
                 .Where(c => c.IsDeleted == false)
