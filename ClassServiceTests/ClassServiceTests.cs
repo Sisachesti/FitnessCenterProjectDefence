@@ -3,6 +3,7 @@ using System.Linq.Expressions;
 using AutoMapper;
 using FitnessCenter.Common;
 using FitnessCenter.Web.ViewModels.Gym;
+using Microsoft.EntityFrameworkCore;
 
 namespace FitnessCenter.Services.Tests
 {
@@ -17,6 +18,8 @@ namespace FitnessCenter.Services.Tests
     using Moq;
     using static Common.EntityValidationConstants.Class;
     using static Common.ApplicationConstants;
+    using FitnessCenter.Web.ViewModels.GymClass;
+    using System.Collections.Generic;
 
     [TestFixture]
     public class Tests
@@ -928,7 +931,7 @@ namespace FitnessCenter.Services.Tests
         }
 
         [Test]
-        public async Task EditClassClassImageNullPositive()
+        public async Task EditClassClassNoImagePositive()
         {
             IClassService classService = new ClassService(classRepository.Object, gymRepository.Object, gymClassRepository.Object);
 
@@ -967,5 +970,212 @@ namespace FitnessCenter.Services.Tests
             classRepository.Verify(r => r.UpdateAsync(It.Is<Class>(c => c.ImageUrl == NoImageUrl)), Times.Once);
         }
 
+        [Test]
+        public async Task EditClassClassImageNullPositive()
+        {
+            IClassService classService = new ClassService(classRepository.Object, gymRepository.Object, gymClassRepository.Object);
+
+            Guid classGuid = Guid.Parse("95766741-DE9A-4380-9D0A-3E2B22099004");
+
+            var formModel = new EditClassFormModel
+            {
+                Id = classGuid.ToString(),
+                Title = "Yoga Class",
+                StartingDate = new DateTime(2024, 12, 13, 11, 00, 00).ToString(StartingDateFormat, CultureInfo.InvariantCulture),
+                Duration = 90,
+                Description = "Perfect for beginners or those seeking a calming, slower-paced practice. This class focuses on foundational poses, gentle stretches, and breathwork to enhance flexibility and relaxation. No prior experience needed.",
+                ImageUrl = null
+            };
+            Class editedClass = new Class()
+            {
+                Id = classGuid,
+                Title = "Yoga Class",
+                StartingDate = new DateTime(2024, 12, 13, 11, 00, 00),
+                Duration = 90,
+                Description = "Perfect for beginners or those seeking a calming, slower-paced practice. This class focuses on foundational poses, gentle stretches, and breathwork to enhance flexibility and relaxation. No prior experience needed.",
+                ImageUrl = NoImageUrl
+            };
+
+            classRepository.Setup(r => r.UpdateAsync(It.IsAny<Class>()))
+                .Returns(Task.FromResult(true))
+                .Callback<Class>(updatedClass =>
+                {
+                    // Verify that the updated class has the correct ImageUrl
+                    Assert.AreEqual(NoImageUrl, updatedClass.ImageUrl);
+                });
+
+            bool result = await classService.EditClassAsync(formModel);
+
+            Assert.True(result);
+            classRepository.Verify(r => r.UpdateAsync(It.Is<Class>(c => c.ImageUrl == NoImageUrl)), Times.Once);
+        }
+
+        [Test]
+        public async Task GetAvailableSubscribtionsByIdPositive()
+        {
+            IClassService classService = new ClassService(classRepository.Object, gymRepository.Object, gymClassRepository.Object);
+
+            Guid classId = Guid.Parse("07A8335B-49FD-4C8B-A802-F8A783F1E7CE");
+            Guid gymId = Guid.Parse("DA07CD2D-59B2-4572-A1EF-19BBBFDF4984");
+
+            Class mockClass = new Class
+            {
+                Id = classId,
+                Title = "Full-Body Strength Training",
+                StartingDate = new DateTime(2024, 12, 13, 11, 00, 00),
+                Duration = 70,
+                Description = "A well-rounded workout targeting all major muscle groups.",
+                ImageUrl = "https://i0.wp.com/post.healthline.com/wp-content/uploads/2022/04/male-lifting-weight-1296x728-header.jpg?w=1155&h=1528"
+            };
+            Gym mockGym = new Gym
+            {
+                Id = gymId,
+                Name = "Gladiator",
+                Location = "Yambol",
+                IsDeleted = false
+            };
+            GymClass mockGymClass = new GymClass
+            {
+                ClassId = classId,
+                Class = mockClass,
+                GymId = gymId,
+                Gym = mockGym,
+                IsDeleted = true,
+                AvailableSubscribtions = 5
+            };
+            var mockSubscribtions = new AvailableSubscribtionsViewModel()
+            {
+                GymId = gymId.ToString(),
+                ClassId = classId.ToString(),
+                Quantity = 0,
+                AvailableSubscribtions = mockGymClass.AvailableSubscribtions
+            };
+
+            gymClassRepository.Setup(repo => repo.FirstOrDefaultAsync(It.IsAny<Expression<Func<GymClass, bool>>>()))
+                .ReturnsAsync(mockGymClass);
+            var gymClass = await gymClassRepository.Object.FirstOrDefaultAsync(gc => gc.ClassId == classId && gc.GymId == gymId);
+
+            AvailableSubscribtionsViewModel result =
+                await classService.GetAvailableSubscribtionsByIdAsync(gymId, classId);
+
+            Assert.AreEqual(mockSubscribtions.ClassId, result.ClassId);
+            Assert.AreEqual(mockSubscribtions.GymId, result.GymId);
+            Assert.AreEqual(mockSubscribtions.Quantity, result.Quantity);
+            Assert.AreEqual(mockSubscribtions.AvailableSubscribtions, result.AvailableSubscribtions);
+        }
+
+        [Test]
+        public async Task GetAvailableSubscribtionsByIdNoGymClassFoundNegative()
+        {
+            IClassService classService = new ClassService(classRepository.Object, gymRepository.Object, gymClassRepository.Object);
+
+            Guid classId = Guid.Parse("07A8335B-49FD-4C8B-A802-F8A783F1E7CE");
+            Guid gymId = Guid.Parse("DA07CD2D-59B2-4572-A1EF-19BBBFDF4984");
+
+            Class mockClass = new Class
+            {
+                Id = classId,
+                Title = "Full-Body Strength Training",
+                StartingDate = new DateTime(2024, 12, 13, 11, 00, 00),
+                Duration = 70,
+                Description = "A well-rounded workout targeting all major muscle groups.",
+                ImageUrl = "https://i0.wp.com/post.healthline.com/wp-content/uploads/2022/04/male-lifting-weight-1296x728-header.jpg?w=1155&h=1528"
+            };
+            Gym mockGym = new Gym
+            {
+                Id = gymId,
+                Name = "Gladiator",
+                Location = "Yambol",
+                IsDeleted = false
+            };
+            GymClass mockGymClass = null;
+
+            gymClassRepository.Setup(repo => repo.FirstOrDefaultAsync(It.IsAny<Expression<Func<GymClass, bool>>>()))
+                .ReturnsAsync(mockGymClass);
+            var gymClass = await gymClassRepository.Object.FirstOrDefaultAsync(gc => gc.ClassId == classId && gc.GymId == gymId);
+
+            AvailableSubscribtionsViewModel result =
+                await classService.GetAvailableSubscribtionsByIdAsync(gymId, classId);
+
+            Assert.IsNull(result);
+            Assert.IsNull(gymClass);
+        }
+
+        [Test]
+        public async Task SoftDeleteClassPositive()
+        {
+            IClassService classService = new ClassService(classRepository.Object, gymRepository.Object, gymClassRepository.Object);
+
+            Guid classId = Guid.Parse("07A8335B-49FD-4C8B-A802-F8A783F1E7CE");
+
+            Class mockClass = new Class
+            {
+                Id = classId,
+                Title = "Full-Body Strength Training",
+                StartingDate = new DateTime(2024, 12, 13, 11, 00, 00),
+                Duration = 70,
+                Description = "A well-rounded workout targeting all major muscle groups.",
+                ImageUrl = "https://i0.wp.com/post.healthline.com/wp-content/uploads/2022/04/male-lifting-weight-1296x728-header.jpg?w=1155&h=1528"
+            };
+
+            classRepository.Setup(r => r.FirstOrDefaultAsync(It.IsAny<Expression<Func<Class, bool>>>()))
+                .ReturnsAsync(mockClass);
+            var classModel = await classRepository.Object.FirstOrDefaultAsync(c => c.Id.ToString().ToLower() == classId.ToString().ToLower());
+
+            classRepository.Setup(r => r.UpdateAsync(It.IsAny<Class>()))
+                .Returns(Task.FromResult(true))
+                .Callback<Class>(updatedClass =>
+                {
+                    Assert.IsTrue(classModel.IsDeleted);
+                });
+
+            bool result = await classService.SoftDeleteClassAsync(classId);
+
+            Assert.IsTrue(result);
+            classRepository.Verify(r => r.UpdateAsync(It.Is<Class>(c => c.IsDeleted == true)), Times.Once);
+            Assert.IsTrue(classModel.IsDeleted);
+        }
+
+        [Test]
+        public async Task SoftDeleteClass_ClassRepoIsNullNegative()
+        {
+            Mock<IRepository<Class, Guid>>? nullClassRepository = null; // Simulate a null repository
+            var gymRepository = new Mock<IRepository<Gym, Guid>>();
+            var gymClassRepository = new Mock<IRepository<GymClass, object>>();
+
+            // Pass null repository into the service
+            IClassService classService = new ClassService(nullClassRepository?.Object, gymRepository.Object, gymClassRepository.Object);
+
+            Guid classId = Guid.NewGuid(); // Test Guid
+
+            // Act
+            bool result = await classService.SoftDeleteClassAsync(classId);
+
+            // Assert
+            Assert.False(result);
+        }
+
+        [Test]
+        public async Task GetClassesCountByFilter_ShouldReturnCorrectCountWhenValidInputModelPositive()
+        {
+            IQueryable<Class> classesMockQueryable = classesData.BuildMock();
+            this.classRepository
+                .Setup(r => r.GetAllAttached())
+                .Returns(classesMockQueryable);
+
+            IClassService classService = new ClassService(classRepository.Object, gymRepository.Object, gymClassRepository.Object);
+
+            AllClassesSearchFilterViewModel viewModel = new AllClassesSearchFilterViewModel()
+            {
+                SearchQuery = null
+            };
+
+            IEnumerable<AllClassesIndexViewModel> allClassesActual = await classService
+                .GetAllClassesAsync(new AllClassesSearchFilterViewModel());
+
+            int count = await classService.GetClassesCountByFilterAsync(viewModel);
+
+            Assert.AreEqual(allClassesActual.Count(), count);
+        }
     }
 }

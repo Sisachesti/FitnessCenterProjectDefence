@@ -20,7 +20,7 @@ namespace FitnessCenter.Services.Data.Interfaces
 
         Task<bool> EditClassAsync(EditClassFormModel formModel);
 
-        Task<AvailableSubscribtionsViewModel?> GetAvailableSubscribtionsByIdAsync(Guid cinemaId, Guid movieId);
+        Task<AvailableSubscribtionsViewModel?> GetAvailableSubscribtionsByIdAsync(Guid gymId, Guid classId);
 
         Task<DeleteClassViewModel?> GetClassForDeleteByIdAsync(Guid id);
 

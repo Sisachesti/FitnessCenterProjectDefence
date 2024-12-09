@@ -266,13 +266,13 @@
 
         public async Task<bool> SoftDeleteClassAsync(Guid id)
         {
-            Class? classToDelete = await this.classRepository
-                .FirstOrDefaultAsync(c => c.Id.ToString().ToLower() == id.ToString().ToLower());
-
             if (classRepository == null)
             {
                 return false;
             }
+
+            Class? classToDelete = await this.classRepository
+                .FirstOrDefaultAsync(c => c.Id.ToString().ToLower() == id.ToString().ToLower());
 
             classToDelete.IsDeleted = true;
             return await this.classRepository.UpdateAsync(classToDelete);
