@@ -83,10 +83,10 @@ namespace FitnessCenter.Services.Data
 
         public async Task<bool> EditGymAsync(EditGymFormModel model)
         {
-            Gym cinemaEntity = AutoMapperConfig.MapperInstance
+            Gym gym = AutoMapperConfig.MapperInstance
                 .Map<EditGymFormModel, Gym>(model);
 
-            bool result = await this.gymRepository.UpdateAsync(cinemaEntity);
+            bool result = await this.gymRepository.UpdateAsync(gym);
             return result;
         }
 
@@ -103,13 +103,14 @@ namespace FitnessCenter.Services.Data
 
         public async Task<bool> SoftDeleteGymAsync(Guid id)
         {
-            Gym? gymToDelete = await this.gymRepository
-                .FirstOrDefaultAsync(c => c.Id.ToString().ToLower() == id.ToString().ToLower());
 
             if (gymRepository == null)
             {
                 return false;
             }
+
+            Gym? gymToDelete = await this.gymRepository
+                .FirstOrDefaultAsync(c => c.Id.ToString().ToLower() == id.ToString().ToLower());
 
             gymToDelete.IsDeleted = true;
             return await this.gymRepository.UpdateAsync(gymToDelete);

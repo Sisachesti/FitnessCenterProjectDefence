@@ -1,9 +1,6 @@
+using FitnessCenter.Web.ViewModels.Gym;
 using System.Globalization;
 using System.Linq.Expressions;
-using AutoMapper;
-using FitnessCenter.Common;
-using FitnessCenter.Web.ViewModels.Gym;
-using Microsoft.EntityFrameworkCore;
 
 namespace FitnessCenter.Services.Tests
 {
@@ -14,12 +11,12 @@ namespace FitnessCenter.Services.Tests
     using FitnessCenter.Services.Data.Interfaces;
     using FitnessCenter.Services.Mapping;
     using FitnessCenter.Web.ViewModels.Class;
+    using FitnessCenter.Web.ViewModels.GymClass;
     using MockQueryable;
     using Moq;
-    using static Common.EntityValidationConstants.Class;
-    using static Common.ApplicationConstants;
-    using FitnessCenter.Web.ViewModels.GymClass;
     using System.Collections.Generic;
+    using static Common.ApplicationConstants;
+    using static Common.EntityValidationConstants.Class;
 
     [TestFixture]
     public class Tests
