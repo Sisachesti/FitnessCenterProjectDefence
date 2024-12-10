@@ -10,6 +10,8 @@
 
         public bool IsDeleted { get; set; }
 
+        public string? ImageUrl { get; set; }
+
         public virtual ICollection<GymClass> GymClasses { get; set; }
             = new HashSet<GymClass>();
 

@@ -19,14 +19,21 @@
         if (gym.IsDeleted == false)
         {
             <div class="col-md-4">
-            <div class="card mb-4 shadow-sm">
-                <img src="~/images/gym-default.jpg" class="card-img-top" alt="Gym Image" style="height: 250px; object-fit: cover;">
-                <div class="card-body">
-                    <h5 class="card-title">@gym.Name</h5>
-                    <p class="card-text">@gym.Location</p>
-                    <a asp-action="Details" asp-route-id="@gym.Id" class="btn btn-primary">View Class Program</a>
+                <div class="card mb-4 shadow-sm">
+                    @if (!string.IsNullOrEmpty(gym.ImageUrl))
+                    {
+                        <img src="@gym.ImageUrl" class="card-img-top" alt="@gym.Name" style="height: 250px; object-fit: cover;" />
+                    }
+                    else
+                    {
+                        <img src="~/images/gym-default.jpg" class="card-img-top" alt="Gym Image" style="height: 250px; object-fit: cover;">
+                    }
+                    <div class="card-body">
+                        <h5 class="card-title">@gym.Name</h5>
+                        <p class="card-text">@gym.Location</p>
+                        <a asp-action="Details" asp-route-id="@gym.Id" class="btn btn-primary">View Class Program</a>
+                    </div>
                 </div>
-            </div>
             </div>
         }
     }

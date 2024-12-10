@@ -28,6 +28,8 @@ namespace FitnessCenter.Common
             public const int NameMaxLength = 50;
             public const int LocationMinLength = 3;
             public const int LocationMaxLength = 85;
+            public const int ImageUrlMinLength = 8;
+            public const int ImageUrlMaxLength = 2083;
         }
 
         public static class GymClass

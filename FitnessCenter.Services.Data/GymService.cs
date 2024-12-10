@@ -52,6 +52,7 @@ namespace FitnessCenter.Services.Data
                     Id = gym.Id.ToString(),
                     Name = gym.Name,
                     Location = gym.Location,
+                    ImageUrl = gym.ImageUrl,
                     Classes = gym.GymClasses
                         .Where(gc => gc.IsDeleted == false)
                         .Select(gc => new GymClassViewModel()

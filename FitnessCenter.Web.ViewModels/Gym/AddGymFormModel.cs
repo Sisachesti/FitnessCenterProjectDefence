@@ -16,5 +16,8 @@ namespace FitnessCenter.Web.ViewModels.Gym
         [MinLength(LocationMinLength)]
         [MaxLength(LocationMaxLength)]
         public string Location { get; set; } = null!;
+
+        [MaxLength(ImageUrlMaxLength)]
+        public string? ImageUrl { get; set; }
     }
 }

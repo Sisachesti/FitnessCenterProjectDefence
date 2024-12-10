@@ -22,6 +22,9 @@ namespace FitnessCenter.Web.ViewModels.Gym
         [MaxLength(LocationMaxLength)]
         public string Location { get; set; } = null!;
 
+        [MaxLength(ImageUrlMaxLength)]
+        public string? ImageUrl { get; set; }
+
         public void CreateMappings(IProfileExpression configuration)
         {
             configuration

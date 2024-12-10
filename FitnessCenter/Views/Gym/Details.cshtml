@@ -2,7 +2,7 @@
 @using FitnessCenter.Services.Data.Interfaces
 @using FitnessCenter.Web.Infrastructure.Extensions
 @using Microsoft.AspNetCore.Mvc.TagHelpers
-@model GymDetailsViewModel
+@model FitnessCenter.Web.ViewModels.Gym.GymDetailsViewModel
 
 @inject IManagerService managerService
 
@@ -11,6 +11,18 @@
 }
 
 <h2 class="my-4 text-center display-4">Gym Program - @Model.Name</h2>
+@if (!string.IsNullOrEmpty(Model.ImageUrl))
+{
+    <div style="display: flex; justify-content: center; align-items: center;">
+        <img src="@Model.ImageUrl" alt="@Model.Name" style="height: 250px; object-fit: cover; border: 3px solid grey;" />
+    </div>
+}
+else
+{
+    <div style="display: flex; justify-content: center; align-items: center;">
+        <img src="~/images/gym-default.jpg" alt="Gym Image" style="height: 250px; object-fit: cover; border: 3px solid grey;">
+    </div>
+}
 <p class="text-center lead"><strong>Location:</strong> @Model.Location</p>
 
 <div id="manageSubscribtionsModalContainer">

@@ -16,6 +16,8 @@ namespace FitnessCenter.Web.ViewModels.Gym
 
         public string Location { get; set; } = null!;
 
+        public string? ImageUrl { get; set; }
+
         public IEnumerable<GymClassViewModel> Classes { get; set; }
             = new HashSet<GymClassViewModel>();
     }

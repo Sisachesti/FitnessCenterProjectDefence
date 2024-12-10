@@ -1,5 +1,6 @@
 ﻿﻿@using FitnessCenter.Web.ViewModels.Gym
-@model EditGymFormModel
+@using Microsoft.AspNetCore.Mvc.TagHelpers
+@model FitnessCenter.Web.ViewModels.Gym.EditGymFormModel
 
 <h2>Edit Gym Information</h2>
 
@@ -16,6 +17,12 @@
     <div class="form-group">
         <label asp-for="Location" class="control-label"></label>
         <input asp-for="Location" class="form-control" />
+        <span asp-validation-for="Location" class="text-danger"></span>
+    </div>
+    
+    <div class="form-group">
+        <label asp-for="ImageUrl" class="control-label"></label>
+        <input asp-for="ImageUrl" class="form-control" />
         <span asp-validation-for="Location" class="text-danger"></span>
     </div>
 
