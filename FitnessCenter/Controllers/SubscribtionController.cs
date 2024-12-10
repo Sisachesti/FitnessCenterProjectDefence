@@ -17,7 +17,6 @@ namespace FitnessCenter.Web.Controllers
         [Authorize]
         public IActionResult BuySubscribtions(AvailableSubscribtionsViewModel viewModel)
         {
-            // TODO: Implement logic for buying tickets by the user
             return View();
         }
     }

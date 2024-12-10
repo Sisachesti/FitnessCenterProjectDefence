@@ -85,7 +85,6 @@
 
             Guid userGuid = Guid.Parse(userId);
 
-            // TODO: Implement Soft-Delete
             ApplicationUserClass? applicationUserClass = await this.userClassRepository
                 .FirstOrDefaultAsync(uc => uc.ClassId == classGuid &&
                                            uc.ApplicationUserId == userGuid);

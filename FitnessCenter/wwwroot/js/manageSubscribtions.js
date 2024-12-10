@@ -86,6 +86,8 @@ function updateAvailableSubscribtions(classId, gymId) {
 }
 
 function buySubscribtionsModal(gymId, classId) {
+    const availableSubscribtions = document.getElementById(`availableSubscribtions-${classId}`).value;
+
     fetch(`https://localhost:7078/SubscribtionApi/GetSubscribtionsAvailability`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -96,8 +98,8 @@ function buySubscribtionsModal(gymId, classId) {
     })
         .then(response => response.json())
         .then(viewModel => {
-            $("#gymId").val(viewModel.gymId);
-            $("#classId").val(viewModel.classId);
+            $("#GymId").val(viewModel.gymId);
+            $("#ClassId").val(viewModel.classId);
             $("#Quantity").prop("min", "1");
             $("#Quantity").prop("max", `${viewModel.availableSubscribtions}`);
             $("#AvailableSubscribtions").val(viewModel.availableSubscribtions);

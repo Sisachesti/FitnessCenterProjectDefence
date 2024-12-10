@@ -10,15 +10,15 @@
             </div>
             <div class="modal-body">
                 <form id="buySubscribtionForm" asp-controller="Subscribtion" asp-action="BuySubscribtions">
-                    <input type="hidden" asp-for="GymId" />
-                    <input type="hidden" asp-for="ClassId" />
+                    <input type="hidden" id="gymId" asp-for="GymId"/>
+                    <input type="hidden" id="classId" asp-for="ClassId"/>
                     <div class="mb-3">
                         <label for="Quantity" class="form-label">Number of Subscribtions</label>
                         <input type="number" asp-for="Quantity" class="form-control" min="1" required />
                     </div>
                     <div class="mb-3">
-                        <label for="Quantity" class="form-label">Available subscribtions</label>
-                        <input type="number" asp-for="AvailableSubscribtions" class="form-control" disabled="disabled" />
+                        <label for="AvailableSubscribtions" class="form-label">Available Subscribtions</label>
+                        <input type="number" id="AvailableSubscribtions" asp-for="AvailableSubscribtions" class="form-control" disabled="disabled" />
                     </div>
                     <div id="errorMessage" class="text-danger d-none"></div>
                     <div class="modal-footer">

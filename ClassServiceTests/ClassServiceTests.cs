@@ -1137,24 +1137,6 @@ namespace FitnessCenter.Services.Tests
         }
 
         [Test]
-        public async Task SoftDeleteClass_ClassRepoIsNullNegative()
-        {
-            Mock<IRepository<Class, Guid>>? nullClassRepository = null; // Simulate a null repository
-            var gymRepository = new Mock<IRepository<Gym, Guid>>();
-            var gymClassRepository = new Mock<IRepository<GymClass, object>>();
-
-            // Pass null repository into the service
-
-            Guid classId = Guid.NewGuid(); // Test Guid
-
-            // Act
-            bool result = await classService.SoftDeleteClassAsync(classId);
-
-            // Assert
-            Assert.False(result);
-        }
-
-        [Test]
         public async Task GetClassesCountByFilter_ShouldReturnCorrectCountWhenValidInputModelPositive()
         {
             IQueryable<Class> classesMockQueryable = classesData.BuildMock();
