@@ -31,5 +31,51 @@ namespace FitnessCenter.Services.Data
 
             return result;
         }
+
+
+
+        public async Task<bool> RemoveManagerAsync(string? userId)
+        {
+            // Not a valid use-case, but we write defensive programming
+            if (String.IsNullOrWhiteSpace(userId))
+            {
+                return false;
+            }
+
+            Manager managerToDelete = await this.managersRepository
+                .FirstOrDefaultAsync(m => m.UserId.ToString() == userId);
+
+            bool result = await this.managersRepository
+                .DeleteAsync(managerToDelete);
+
+            return result;
+        }
+
+        public async Task<bool> AddManagerAsync(string? userId)
+        {
+            // Not a valid use-case, but we write defensive programming
+            if (String.IsNullOrWhiteSpace(userId))
+            {
+                return false;
+            }
+
+            Manager foundManager = await this.managersRepository
+                .FirstOrDefaultAsync(m => m.UserId.ToString() == userId);
+
+            if (foundManager == null)
+            {
+                Manager managerToAdd = new Manager()
+                {
+                    Id = Guid.NewGuid(),
+                    UserId = Guid.Parse(userId),
+                    WorkPhoneNumber = "0888 123 1234"
+                };
+
+                await this.managersRepository
+                    .AddAsync(managerToAdd);
+            }
+
+            return true;
+        }
     }
 }

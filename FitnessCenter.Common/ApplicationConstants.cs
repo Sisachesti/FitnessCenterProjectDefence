@@ -8,5 +8,6 @@
         public const string IsManagerCookieName = "IsManager";
 
         public const string AdminRoleName = "Admin";
+        public const string ManagerRoleName = "Manager";
     }
 }

@@ -1,9 +1,12 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using FitnessCenter.Common;
+using Microsoft.AspNetCore.Mvc;
 using FitnessCenter.Web.Controllers;
 using FitnessCenter.Services.Data.Interfaces;
 using FitnessCenter.Web.ViewModels.Admin.UserManagement;
 using Microsoft.AspNetCore.Authorization;
 using static FitnessCenter.Common.ApplicationConstants;
+using FitnessCenter.Data.Models;
+using Microsoft.AspNetCore.Identity;
 
 namespace FitnessCenter.Web.Areas.Admin.Controllers
 {
@@ -39,6 +42,7 @@ namespace FitnessCenter.Web.Areas.Admin.Controllers
 
             bool userExists = await this.userService
                 .UserExistsByIdAsync(userGuid);
+
             if (!userExists)
             {
                 return this.RedirectToAction(nameof(Index));
@@ -46,9 +50,15 @@ namespace FitnessCenter.Web.Areas.Admin.Controllers
 
             bool assignResult = await this.userService
                 .AssignUserToRoleAsync(userGuid, role);
+
             if (!assignResult)
             {
                 return this.RedirectToAction(nameof(Index));
+            }
+
+            if (role == ManagerRoleName && await this.managerService.IsUserManagerAsync(userGuid.ToString()) == false)
+            {
+                await this.managerService.AddManagerAsync(userId);
             }
 
             return this.RedirectToAction(nameof(Index));
@@ -65,6 +75,7 @@ namespace FitnessCenter.Web.Areas.Admin.Controllers
 
             bool userExists = await this.userService
                 .UserExistsByIdAsync(userGuid);
+
             if (!userExists)
             {
                 return this.RedirectToAction(nameof(Index));
@@ -72,9 +83,15 @@ namespace FitnessCenter.Web.Areas.Admin.Controllers
 
             bool removeResult = await this.userService
                 .RemoveUserRoleAsync(userGuid, role);
+
             if (!removeResult)
             {
                 return this.RedirectToAction(nameof(Index));
+            }
+
+            if (role == ManagerRoleName && await this.managerService.IsUserManagerAsync(userGuid.ToString()) == true)
+            {
+                await this.managerService.RemoveManagerAsync(userId);
             }
 
             return this.RedirectToAction(nameof(Index));

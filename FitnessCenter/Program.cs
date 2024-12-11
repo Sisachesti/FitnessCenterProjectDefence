@@ -74,6 +74,7 @@ namespace FitnessCenter
             if (app.Environment.IsDevelopment())
             {
                 ConfigureAdmin(builder, app);
+                ConfigureManager(builder, app);
             }
 
             app.UseStatusCodePagesWithRedirects("/Home/Error/{0}");
@@ -126,6 +127,15 @@ namespace FitnessCenter
             string adminPassword = builder.Configuration.GetValue<string>("Administrator:Password")!;
 
             app.SeedAdministrator(adminEmail, adminUsername, adminPassword);
+        }
+
+        private static void ConfigureManager(WebApplicationBuilder builder, WebApplication app)
+        {
+            string adminEmail = builder.Configuration.GetValue<string>("Manager:Email")!;
+            string adminUsername = builder.Configuration.GetValue<string>("Manager:Username")!;
+            string adminPassword = builder.Configuration.GetValue<string>("Manager:Password")!;
+
+            app.SeedManager(adminEmail, adminUsername, adminPassword);
         }
     }
 }
