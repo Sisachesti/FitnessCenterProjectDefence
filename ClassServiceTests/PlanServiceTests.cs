@@ -136,5 +136,84 @@ namespace FitnessCenter.Services.Tests
                 uc.ApplicationUserId == Guid.Parse(userId) &&
                 uc.ClassId == Guid.Parse(classId))), Times.Once);
         }
+
+        [Test]
+        public async Task RemoveClassFromUserPlans_ClassGuidNotValidNegative()
+        {
+            string userId = Guid.NewGuid().ToString();
+            string classId = "0000";
+
+            bool result = await planService.RemoveClassFromUserPlansAsync(classId, userId);
+
+            Assert.IsFalse(result);
+        }
+
+        [Test]
+        public async Task RemoveClassFromUserPlans_ClassIsNullNegative()
+        {
+            Guid userId = Guid.NewGuid();
+            Guid classId = Guid.NewGuid();
+            Guid searchedId = Guid.NewGuid();
+
+            Class mockClass = new Class()
+            {
+                Id = classId
+            };
+
+            classRepository.Setup(r => r.GetByIdAsync(classId)).ReturnsAsync(mockClass);
+
+            bool result = await planService.RemoveClassFromUserPlansAsync(searchedId.ToString(), userId.ToString());
+
+            Assert.IsFalse(result);
+        }
+
+        [Test]
+        public async Task RemoveClassFromUserPlans_FoundApplicationUserClass()
+        {
+            string userId = Guid.NewGuid().ToString();
+            string classId = Guid.NewGuid().ToString();
+            Guid classGuid = Guid.Parse(classId);
+
+            Class mockClass = new Class()
+            {
+                Id = Guid.Parse(classId)
+            };
+
+            var applicationUserClass = new ApplicationUserClass
+            {
+                ClassId = classGuid,
+                ApplicationUserId = Guid.Parse(userId)
+            };
+
+            userClassRepository
+                .Setup(r => r.FirstOrDefaultAsync(It.IsAny<Expression<Func<ApplicationUserClass, bool>>>()))
+                .ReturnsAsync((Expression<Func<ApplicationUserClass, bool>> predicate) =>
+                {
+                    // Simulate a database evaluation of the predicate
+                    if (predicate.Compile().Invoke(applicationUserClass))
+                    {
+                        return applicationUserClass;
+                    }
+                    return null;
+                });
+
+            classRepository.Setup(r => r.GetByIdAsync(Guid.Parse(classId))).ReturnsAsync(mockClass);
+
+            userClassRepository
+                .Setup(repo => repo.DeleteAsync(applicationUserClass))
+                .Returns(Task.FromResult(true));
+
+            // Act
+            await userClassRepository.Object.DeleteAsync(applicationUserClass);
+
+            // Assert
+            userClassRepository.Verify(repo => repo.DeleteAsync(applicationUserClass), Times.Once,
+                "DeleteAsync should be called exactly once with the specified entity.");
+
+            bool result = await planService.RemoveClassFromUserPlansAsync(classId.ToString(), userId.ToString());
+
+            Assert.IsTrue(result);
+            Assert.IsNotNull(applicationUserClass);
+        }
     }
 }
